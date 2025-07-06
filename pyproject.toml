@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "showme-backend"
+version = "0.1.0"
+description = "Tourist POI backend"
+authors = ["Your Name <you@example.com>"]
+
+[[tool.poetry.packages]]
+include = "app"
+from = "."
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+sqlalchemy = "*"
+asyncpg = "*"
+geoalchemy2 = "*"
+python-dotenv = "*"
+pydantic = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+httpx = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-postgresql = "*"
+black = "*"
+isort = "*"
+mypy = "*"
