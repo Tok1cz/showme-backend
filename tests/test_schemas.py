@@ -1,4 +1,4 @@
-from app.schemas import AttractionList
+from app.schemas.attraction import AttractionList
 
 def test_attractionlist_schema():
     data = {

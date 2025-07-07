@@ -209,3 +209,7 @@ __marimo__/
 *.pbf
 
 experiment/
+
+backend_file_tree.txt
+images/
+*.env.*

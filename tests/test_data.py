@@ -1,7 +1,7 @@
 # tests/test_data.py
 import pytest
 from unittest.mock import AsyncMock
-from app.db import queries
+from app.db.queries import poi
 
 @pytest.mark.asyncio
 async def test_get_n_nearest_attractions_mock(monkeypatch):
@@ -30,13 +30,13 @@ async def test_get_n_nearest_attractions_mock(monkeypatch):
     async def fake_query(session, lat, lon, n, extra_where=""):
         return fake_data[:n]
 
-    monkeypatch.setattr(queries, "get_n_nearest_attractions", fake_query)
+    monkeypatch.setattr(poi, "get_n_nearest_attractions", fake_query)
 
     # Simulate a fake session object (not used here, but required by signature)
     class DummySession: pass
     session = DummySession()
 
-    results = await queries.get_n_nearest_attractions(session, 55.0, -3.0, 2) # type: ignore
+    results = await poi.get_n_nearest_attractions(session, 55.0, -3.0, 2) # type: ignore
     assert isinstance(results, list)
     assert len(results) == 2
     for row in results:
