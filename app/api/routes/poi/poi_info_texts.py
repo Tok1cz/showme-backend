@@ -5,6 +5,8 @@ from app.db.queries.poi_info_texts import (
 )
 from app.schemas.poi_info_text import  POIInfoTextOut
 from app.db.session import get_session
+from app.api.utils.serialize import serialize_poi_info_text
+
 
 router = APIRouter()
 
@@ -16,4 +18,6 @@ async def list_info_texts(
     style: Optional[str] = None,
     session=Depends(get_session)
 ):
-    return await get_poi_info_texts(session, poi_id, topic=topic, style=style)
+    infos = await get_poi_info_texts(session, poi_id, topic=topic, style=style)
+    return [serialize_poi_info_text(info) for info in infos]
+

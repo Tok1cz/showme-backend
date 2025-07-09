@@ -213,3 +213,9 @@ experiment/
 backend_file_tree.txt
 images/
 *.env.*
+
+api_spec.json
+
+calc.py
+commands.txt
+setup.txt

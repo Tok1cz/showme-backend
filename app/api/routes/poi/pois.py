@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.db.session import get_session
 from app.db.queries.poi import get_n_nearest_attractions, get_poi_by_id
-from app.schemas.attraction import AttractionList
+from app.schemas.poi import AttractionList
 
 router = APIRouter()
 

@@ -18,6 +18,8 @@ geoalchemy2 = "*"
 python-dotenv = "*"
 pydantic = "*"
 pydantic-settings = "^2.10.1"
+psycopg2-binary = "^2.9.10"
+celery = {extras = ["redis"], version = "^5.5.3"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

@@ -1,10 +1,25 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
+from typing import ClassVar
+
 
 class Settings(BaseSettings):
-    database_url: str
-    base_image_url: str = "http://localhost:8000/images/"
-    debug: bool = False
 
+    REGIONS: ClassVar[list[str]] = ["albania", "andorra"]
+    CONTINENT: ClassVar[str] = "europe"
+
+    DATABASE_URL: str
+    DATABASE_URL_SYNCH: str
+    CELERY_BROKER_URL:str
+    CELERY_BACKEND_URL:str
+    BASE_IMAGE_URL: str = "http://localhost:8000/images/"
+    DEBUG: bool = False
+    OSM_BASE_URL: str = "https://download.geofabrik.de/"
+    OSM_IMPORT_DIR: str = "/var/tmp/osm_imports/"
+    OSM_RETENTION_DAYS:int=2
+    
     model_config = SettingsConfigDict(env_file=".env")
 
-settings = Settings() # type: ignore
+
+
+settings = Settings()  # type: ignore
