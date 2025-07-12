@@ -38,3 +38,21 @@ async def add_information_topic(session: AsyncSession, name: str) -> Information
 async def delete_information_topic(session: AsyncSession, topic_id: int) -> None:
     await session.execute(delete(InformationTopic).where(InformationTopic.id == topic_id))
     await session.commit()
+
+# --- InformationStyle by name ---
+async def get_information_style_by_name(session: AsyncSession, name: str):
+    stmt = select(InformationStyle).where(InformationStyle.name == name)
+    result = await session.execute(stmt)
+    return result.scalars().first()
+
+# --- InformationTopic by name ---
+async def get_information_topic_by_name(session: AsyncSession, name: str):
+    stmt = select(InformationTopic).where(InformationTopic.name == name)
+    result = await session.execute(stmt)
+    return result.scalars().first()
+
+# --- ImageStyle by name ---
+async def get_image_style_by_name(session: AsyncSession, name: str):
+    stmt = select(ImageStyle).where(ImageStyle.name == name)
+    result = await session.execute(stmt)
+    return result.scalars().first()

@@ -5,7 +5,7 @@ from typing import ClassVar
 
 class Settings(BaseSettings):
 
-    REGIONS: ClassVar[list[str]] = ["albania", "andorra"]
+    REGIONS: ClassVar[list[str]] = ["great-britain","germany"]
     CONTINENT: ClassVar[str] = "europe"
 
     DATABASE_URL: str
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     OSM_BASE_URL: str = "https://download.geofabrik.de/"
     OSM_IMPORT_DIR: str = "/var/tmp/osm_imports/"
     OSM_RETENTION_DAYS:int=2
-    
+    OPEN_API_KEY: str
     model_config = SettingsConfigDict(env_file=".env")
 
 

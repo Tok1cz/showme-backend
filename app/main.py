@@ -1,18 +1,33 @@
-from fastapi import FastAPI
 import logging
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
 from fastapi.staticfiles import StaticFiles
-from app.api.routes import health
+from app.api.routes import health, refdata
 from app.api.routes.poi import poi_images, pois, poi_info_texts
-from app.api.routes.admin import poi_images_cud, poi_info_texts_cud, admin_refdata, osm_import
+from app.api.routes.admin import (
+    poi_images_cud,
+    poi_info_texts_cud,
+    admin_refdata,
+    osm_import,
+    prompt_templates,
+)
 from app.core.settings import settings
+from app.services.generation.providers import register_providers
+from app.services.text_generation.providers.openai import OpenAITextProvider
 
 if settings.DEBUG:
     logging.basicConfig(level=logging.DEBUG)
 else:
     logging.basicConfig(level=logging.INFO)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Register your providers here at startup
+    register_providers()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 app.mount("/images", StaticFiles(directory="images"), name="images")
 
 app.include_router(pois.router, prefix="/pois", tags=["POIs"])
@@ -23,5 +38,7 @@ app.include_router(poi_images_cud.router, prefix="/admin", tags=["Admin"])
 app.include_router(poi_info_texts_cud.router, prefix="/admin", tags=["Admin"])
 app.include_router(admin_refdata.router, prefix="/admin", tags=["Admin"])
 app.include_router(osm_import.router, prefix="/admin", tags=["Admin"])
+app.include_router(prompt_templates.router, prefix="/admin", tags=["Admin"])
 
+app.include_router(refdata.router, prefix="/refdata", tags=["Refdata"])
 app.include_router(health.router)

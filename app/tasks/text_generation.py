@@ -1,0 +1,74 @@
+from celery import shared_task
+import asyncio
+from sqlalchemy.orm import Session
+from datetime import datetime
+from app.db.session import SyncSessionLocal
+from app.db.models.poi_models import POIInfoText
+from app.db.models.text_generation_job import TextGenerationJob
+from app.services.generation.registry import registry
+from app.db.enums import GenerationJobStatus
+
+@shared_task
+def generate_info_text_task(
+    poi_id,
+    topic_id,
+    style_id,
+    text_length,
+    provider,
+    model,
+    prompt,
+    task_id,
+    context_data,
+):
+    with SyncSessionLocal() as session:
+        try:
+            job = session.query(TextGenerationJob).filter_by(task_id=task_id).first()
+            if job:
+                job.status = GenerationJobStatus.generating # type: ignore
+                session.commit()
+            provider_instance = registry.get_text(provider)
+            # Synchronously call provider's generate (handle async if needed)
+
+            if hasattr(provider_instance.generate, "__call__") and asyncio.iscoroutinefunction(provider_instance.generate):
+                info_text = asyncio.run(provider_instance.generate(prompt, model=model, **(context_data or {})))
+            else:
+                info_text = provider_instance.generate(prompt, model=model, **(context_data or {}))
+            # Update POIInfoText
+            session.query(POIInfoText).filter(
+                POIInfoText.poi_id == poi_id,
+                POIInfoText.topic_id == topic_id,
+                POIInfoText.style_id == style_id,
+                POIInfoText.text_length == text_length,
+                POIInfoText.task_id == task_id
+            ).update({
+                "info_text": info_text,
+                "status": GenerationJobStatus.ready,
+                "error_msg": None,
+                "updated_at": datetime.utcnow(),
+            })
+            # Update Job
+            if job:
+                job.status = GenerationJobStatus.ready # type: ignore
+                job.result = {"info_text": info_text} # type: ignore
+                job.error_msg = None # type: ignore
+                job.finished_at = datetime.utcnow() # type: ignore
+            session.commit()
+        except Exception as e:
+            print(e)
+            session.query(POIInfoText).filter(
+                POIInfoText.poi_id == poi_id,
+                POIInfoText.topic_id == topic_id,
+                POIInfoText.style_id == style_id,
+                POIInfoText.text_length == text_length,
+                POIInfoText.task_id == task_id
+            ).update({
+                "status": "failed",
+                "error_msg": str(e),
+                "updated_at": datetime.utcnow(),
+            })
+            job = session.query(TextGenerationJob).filter_by(task_id=task_id).first()
+            if job:
+                job.status = GenerationJobStatus.failed # type: ignore
+                job.error_msg = str(e) if e else None # type: ignore
+                job.finished_at = datetime.utcnow() # type: ignore
+            session.commit()
