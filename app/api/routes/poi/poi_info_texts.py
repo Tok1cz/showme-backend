@@ -8,32 +8,36 @@ from app.schemas.text_generation_job import TextGenerationJobOut, InfoTextStatus
 from app.services.text_generation.service import InfoTextService
 from app.db.enums import TextLength
 from app.db.models.text_generation_job import TextGenerationJob
-
+from app.db.queries.refdata import get_information_topic_by_name, get_information_style_by_name
 router = APIRouter(prefix="/poi-info-texts", tags=["POIs"])
 
 # --- SINGLE INFO TEXT ENDPOINT ---
-class InfoTextResponse(POIInfoTextOut):
-    status: str
-    task_id: Optional[str] = None
 
-@router.get("/", response_model=POIInfoTextOut) #@router.get("/", response_model=Union[POIInfoTextOut, InfoTextResponse])
+
+@router.get("/", response_model=Union[POIInfoTextOut, InfoTextStatusResponse])
 async def get_info_text(
     poi_id: int = Query(...),
-    topic_id: int = Query(...),
-    style_id: int = Query(...),
+    topic: str = Query(..., description="Topic name"),
+    style: str = Query(..., description="Style name"),
     text_length: Optional[TextLength] = Query(None),
     force: bool = Query(False),
     session: AsyncSession = Depends(get_session),
 ):
+    # Resolve names to IDs
+    topic_obj = await get_information_topic_by_name(session, topic)
+    if not topic_obj:
+        raise HTTPException(404, f"Topic '{topic}' not found")
+    style_obj = await get_information_style_by_name(session, style)
+    if not style_obj:
+        raise HTTPException(404, f"Style '{style}' not found")
     service = InfoTextService(session)
     result = await service.get_or_generate_info_text(
         poi_id=poi_id,
-        topic_id=topic_id,
-        style_id=style_id,
+        topic_id=topic_obj.id,
+        style_id=style_obj.id,
         text_length=text_length,
         force=force
     )
-    # If you want to wrap the result in a schema, you can map it here
     return result
 
 # --- BULK ENDPOINT ---

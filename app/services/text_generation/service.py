@@ -11,7 +11,8 @@ from app.services.generation.registry import registry
 from app.db.queries.prompt_templates import get_prompt_template
 from app.tasks.text_generation import generate_info_text_task  # celery task
 from app.db.models.prompt_template import PromptTemplate
-
+from app.db.queries.poi import get_poi_by_id
+from app.exceptions.db import NotFoundInDBError
 
 class InfoTextService:
     def __init__(self, session: AsyncSession):
@@ -28,8 +29,17 @@ class InfoTextService:
         model: str = "gpt-4o",
         force: bool = False,
         prompt_version: int = 1,
-        context_data: dict = None
     ):
+        poi = await get_poi_by_id(self.session, poi_id)
+        if not poi:
+            raise NotFoundInDBError(f"POI with id {poi_id} not found")
+    
+        context_data = {
+            "name": poi["name"],
+            "lat": poi["lat"],
+            "lon": poi["lon"],
+            "description": poi["description"],  
+        }
         # 1. DB lookup for existing info_text
         stmt = select(POIInfoText).where(
             POIInfoText.poi_id == poi_id,
@@ -51,7 +61,7 @@ class InfoTextService:
             self.session, provider, model, topic_id, style_id, prompt_version
         )
         if not tmpl:
-            raise Exception("Prompt template not found for these parameters")
+            raise NotFoundInDBError("Prompt template not found for these parameters")
         builder = PromptBuilder(
             tmpl.template if isinstance(tmpl.template, str) else tmpl.template.value
         )
@@ -150,7 +160,6 @@ class InfoTextService:
                 "provider": provider,
                 "model": model,
                 "force": force,
-                "context_data": req.get("context_data"),
             }
             prompt_version = req.get("prompt_version")
             if isinstance(prompt_version, int):

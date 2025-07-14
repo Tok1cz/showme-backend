@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 from app.db.enums import GeometryType, TextLength
+from app.schemas.refdata import RefDataOut
 
 
 class POIInfoTextCreate(BaseModel):
@@ -28,8 +29,8 @@ class POIInfoTextOut(BaseModel):
     poi_id: int
     info_text: Optional[str]
     prompt: Optional[str]
-    # topic: Optional[RefDataItem] #TODO!
-    # style: Optional[RefDataItem]
+    topic: Optional[RefDataOut]
+    style: Optional[RefDataOut]
     source: Optional[str]
     status: Optional[str]
     created_at: Optional[datetime]

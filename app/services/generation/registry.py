@@ -2,7 +2,6 @@ from typing import Dict
 from app.services.image_generation.provider import ImageGenerationProvider
 from app.services.text_generation.provider import TextGenerationProvider
 from app.services.audio_generation.provider import AudioGenerationProvider
-from app.core.settings import settings
 
 
 class ProviderRegistry:

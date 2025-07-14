@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.db.queries.admin_refdata import (
+from app.db.queries.refdata import (
     add_image_style, delete_image_style,
     add_information_style, delete_information_style,
     add_information_topic, delete_information_topic,
 )
 from app.db.session import get_session
-from app.schemas.admin_refdata import RefDataCreate, RefDataOut
+from app.schemas.refdata import RefDataCreate, RefDataOut
 
 router = APIRouter(prefix="/refdata", tags=["Admin: Reference Data"])
 

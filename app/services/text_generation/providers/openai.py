@@ -10,9 +10,10 @@ class OpenAITextProvider(TextGenerationProvider):
         response = await self.client.chat.completions.create(
             model=model or self.default_model,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=kwargs.get("max_tokens", 256),
+            max_tokens=kwargs.get("max_tokens", 10000),
             temperature=kwargs.get("temperature", 0.7),
         )
+        print(response.choices[0].message.content.strip())
         return response.choices[0].message.content.strip()
 
     async def get_available_models(self) -> list[str]:
