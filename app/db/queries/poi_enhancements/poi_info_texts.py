@@ -4,7 +4,7 @@ from sqlalchemy.future import select
 from sqlalchemy import update, delete
 from sqlalchemy.orm import joinedload
 
-from app.db.models.poi_models import POIInfoText, InformationTopic, InformationStyle
+from app.db.models.poi_enhancements import POIInfoText, InformationTopic, InformationStyle
 from app.db.enums import GeometryType
 
 # ---- Helper: Resolve topic/style name to ID ----

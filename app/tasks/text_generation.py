@@ -3,8 +3,8 @@ import asyncio
 from sqlalchemy.orm import Session
 from datetime import datetime
 from app.db.session import SyncSessionLocal
-from app.db.models.poi_models import POIInfoText
-from app.db.models.text_generation_job import TextGenerationJob
+from app.db.models.poi_enhancements import POIInfoText
+from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
 from app.services.generation.registry import registry
 from app.db.enums import GenerationJobStatus
 

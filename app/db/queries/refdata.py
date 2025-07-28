@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import delete
-from app.db.models.poi_models import ImageStyle, InformationStyle, InformationTopic
+from app.db.models.poi_enhancements import ImageStyle, InformationStyle, InformationTopic
 
 # ---- Image Styles ----
 async def add_image_style(session: AsyncSession, name: str) -> ImageStyle:

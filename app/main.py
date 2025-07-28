@@ -14,7 +14,6 @@ from app.api.routes.admin import (
 )
 from app.core.settings import settings
 from app.services.generation.providers import register_providers
-from app.services.text_generation.providers.openai import OpenAITextProvider
 
 if settings.DEBUG:
     logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +27,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/images", StaticFiles(directory="images"), name="images")
+app.mount("/images", StaticFiles(directory="./images"), name="images")
+app.mount("/audio", StaticFiles(directory="./audio"), name="audio")
 
 app.include_router(pois.router, prefix="/pois", tags=["POIs"])
 app.include_router(poi_images.router, prefix="/pois", tags=["POIs"])

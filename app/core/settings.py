@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import os
 from typing import ClassVar
 
 
@@ -18,7 +17,9 @@ class Settings(BaseSettings):
     OSM_IMPORT_DIR: str = "/var/tmp/osm_imports/"
     OSM_RETENTION_DAYS:int=2
     OPEN_API_KEY: str
+    MEDIA_STORAGE_BACKEND: str = "local"  # or "cdn"
     model_config = SettingsConfigDict(env_file=".env")
+
 
 
 

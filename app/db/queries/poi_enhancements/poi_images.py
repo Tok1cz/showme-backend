@@ -6,8 +6,8 @@ from sqlalchemy.future import select
 from sqlalchemy import update, delete
 from sqlalchemy.orm import joinedload
 
-from app.db.models.poi_models import POIImage, ImageStyle
-from app.db.enums import GeometryType, Resolution
+from app.db.models.poi_enhancements import POIImage, ImageStyle, ImageAspect
+from app.db.enums import GeometryType, ImageResolution
 
 # ---- Helper: Resolve style name to ID ----
 
@@ -29,7 +29,7 @@ async def create_poi_image(
     poi_id: int,
     geometry_type: GeometryType,
     filename: str,
-    resolution: Resolution,
+    resolution: ImageResolution,
     style: Optional[str] = None,
     image_url: Optional[str] = None,
     prompt: Optional[str] = None,
@@ -58,7 +58,7 @@ async def get_poi_images(
     session: AsyncSession,
     poi_id: int,
     geometry_type: Optional[GeometryType] = None,
-    resolution: Optional[Resolution] = None,
+    resolution: Optional[ImageResolution] = None,
     style: Optional[str] = None,
 ) -> List[POIImage]:
     stmt = select(POIImage).where(POIImage.poi_id == poi_id)
@@ -113,3 +113,18 @@ async def get_images_for_poi_ids(session: AsyncSession, ids: list[int]) -> list[
     stmt = select(POIImage).where(POIImage.poi_id.in_(ids)).options(joinedload(POIImage.style))
     result = await session.execute(stmt)
     return result.scalars().all()
+
+async def get_aspect_id(session: AsyncSession, aspect_name: str) -> int:
+    """
+    Look up the aspect_id for a given aspect name.
+    Raises ValueError if not found.
+    """
+    if not aspect_name:
+        return None
+    result = await session.execute(
+        select(ImageAspect).where(ImageAspect.name == aspect_name)
+    )
+    aspect = result.scalar_one_or_none()
+    if not aspect:
+        raise ValueError(f"Unknown image aspect: {aspect_name}")
+    return aspect.id

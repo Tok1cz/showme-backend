@@ -3,14 +3,14 @@ from sqlalchemy import select, insert, update
 from uuid import uuid4
 from datetime import datetime
 
-from app.db.models.poi_models import POIInfoText
-from app.db.models.text_generation_job import TextGenerationJob
+from app.db.models.poi_enhancements import POIInfoText
+from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
 from app.db.enums import GenerationJobStatus, TextLength
 from app.services.generation.prompt_builder import PromptBuilder
 from app.services.generation.registry import registry
-from app.db.queries.prompt_templates import get_prompt_template
+from app.db.queries.prompt_templates import get_text_prompt_template
 from app.tasks.text_generation import generate_info_text_task  # celery task
-from app.db.models.prompt_template import PromptTemplate
+from app.db.models.prompt_templates import TextPromptTemplate
 from app.db.queries.poi import get_poi_by_id
 from app.exceptions.db import NotFoundInDBError
 
@@ -57,7 +57,7 @@ class InfoTextService:
                 return {"status": "generating", "task_id": info_text_row.task_id}
 
         # 2. Compose prompt
-        tmpl: PromptTemplate = await get_prompt_template(
+        tmpl: TextPromptTemplate = await get_text_prompt_template(
             self.session, provider, model, topic_id, style_id, prompt_version
         )
         if not tmpl:

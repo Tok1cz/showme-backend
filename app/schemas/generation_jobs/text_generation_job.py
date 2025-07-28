@@ -4,6 +4,7 @@ from uuid import UUID
 from datetime import datetime
 from app.db.enums import GenerationJobStatus
 
+
 class TextGenerationJobOut(BaseModel):
     task_id: UUID
     payload: dict[str, Any]
@@ -15,7 +16,3 @@ class TextGenerationJobOut(BaseModel):
 
     class Config:
         orm_mode = True
-        
-class InfoTextStatusResponse(BaseModel):
-    status: str  # "generating", "failed", etc.
-    task_id: Optional[str] = None

@@ -1,6 +1,9 @@
 from celery import Celery
 from app.core.settings import settings
 from app.services.generation.providers import register_providers
+import app.tasks.text_generation
+import app.tasks.image_generation
+import app.tasks.audio_generation
 
 celery_app = Celery(
     "osm_import",
@@ -12,4 +15,4 @@ celery_app.autodiscover_tasks([
     "app.tasks",
 ])
 register_providers()
-import app.tasks.text_generation
+
