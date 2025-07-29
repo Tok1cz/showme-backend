@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel
-from app.db.enums import GeometryType, ImageResolution
+from app.db.enums import ImageResolution
 from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel

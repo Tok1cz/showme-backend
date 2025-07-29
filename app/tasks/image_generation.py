@@ -43,7 +43,7 @@ def generate_image_task(
             image_filename = f"image_{task_id}.png"
 
             # If using CDN/local, download image bytes and store via MediaStorage
-            if image_url and (MediaStorage.save_image != "local" or settings.MEDIA_STORAGE_BACKEND == "cdn"):
+            if image_url and (settings.MEDIA_STORAGE_BACKEND != "local" or settings.MEDIA_STORAGE_BACKEND == "cdn"):
                 image_data = requests.get(image_url).content
                 stored_url = MediaStorage.save_image(image_filename, image_data)
             else:

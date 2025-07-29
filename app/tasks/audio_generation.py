@@ -87,7 +87,7 @@ def generate_audio_task(
             ).update(
                 {
                     "updated_at": datetime.utcnow(),
-                    "status": EnhancementStatus.active,
+                    "status": EnhancementStatus.inactive,
                 }
             )
             job = session.query(AudioGenerationJob).filter_by(task_id=task_id).first()

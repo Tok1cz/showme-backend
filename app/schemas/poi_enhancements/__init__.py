@@ -4,7 +4,6 @@ from .poi_image import (
     POIImageUpdate,
     POIImageBatchRequest,
     ImageStatusResponse,
-    POIImageBatchRequest,
 )
 from .poi_info_text import (
     POIInfoTextOut,
