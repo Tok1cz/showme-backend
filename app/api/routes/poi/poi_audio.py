@@ -10,7 +10,7 @@ from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJo
 from typing import Optional, List
 
 router = APIRouter(
-    prefix="/poi-audio-gen",
+    prefix="/poi-audio",
 )
 
 

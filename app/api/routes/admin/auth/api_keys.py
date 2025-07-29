@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import uuid4
 from datetime import datetime, timedelta
+import hashlib
 
 from app.db.session import get_session
 from app.db.models.auth.api_key import APIKey
@@ -33,15 +34,15 @@ async def create_api_key(
         raise HTTPException(status_code=400, detail="API keys cannot be created in debug mode.")
     if user.id == 0:
         raise HTTPException(status_code=400, detail="API keys cannot be created for dummy users.")
-    # Generate a new API key (insecure: use a proper secret generator in production!)
+    # Generate a new API key
     raw_key = str(uuid4())
-    key_hash = raw_key  # In production, hash this!
+    key_hash = hashlib.sha256(raw_key.encode()).hexdigest() 
     api_key = APIKey(
         user_id=user.id,
         key_hash=key_hash,
         revoked=False,
         created_at=datetime.utcnow(),
-        expires_at=datetime.utcnow() + timedelta(days=90),  # Optional: set expiry
+        expires_at=datetime.utcnow() + timedelta(days=90),
     )
     session.add(api_key)
     await session.commit()

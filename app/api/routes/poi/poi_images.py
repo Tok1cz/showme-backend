@@ -10,7 +10,7 @@ from app.db.models.generation_jobs.image_generation_job import ImageGenerationJo
 from typing import Optional, List
 
 router = APIRouter(
-    prefix="/poi-images",
+    prefix="/poi_images",
 )
 
 
