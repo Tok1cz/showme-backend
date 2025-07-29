@@ -1,8 +1,8 @@
-"""user role enum
+"""initial schema
 
-Revision ID: 38bbeff281d2
-Revises: c9d14642c4bf
-Create Date: 2025-07-29 16:39:56.545952
+Revision ID: ace2a4a8258c
+Revises: 
+Create Date: 2025-07-29 21:45:22.834927
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '38bbeff281d2'
-down_revision: Union[str, Sequence[str], None] = 'c9d14642c4bf'
+revision: str = 'ace2a4a8258c'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

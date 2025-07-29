@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from app.core.settings import Settings  # adjust path if needed
 from app.db.declarative_base import Base  # declarative_base with metadata
-
+import app.db.base  # ensure base is imported for metadata
 # Load .env
 load_dotenv()
 
@@ -43,11 +43,11 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        include_object=include_object,
         dialect_opts={"paramstyle": "named"},
     )
 
     with context.begin_transaction():
-        context.configure(include_object=include_object)
         context.run_migrations()
 
 
