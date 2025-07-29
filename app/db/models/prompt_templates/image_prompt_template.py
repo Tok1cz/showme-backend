@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
-from app.db.base import Base
+from app.db.declarative_base import Base
 
 class ImagePromptTemplate(Base):
     __tablename__ = "image_prompt_templates"

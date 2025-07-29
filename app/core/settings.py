@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     OSM_RETENTION_DAYS:int=2
     OPEN_API_KEY: str
     MEDIA_STORAGE_BACKEND: str = "local"  # or "cdn"
+
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    JWT_SECRET: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

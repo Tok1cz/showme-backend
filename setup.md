@@ -36,3 +36,7 @@ If import fails, clean up leftover OSM temp tables/functions (pipeline handles t
 
 For permissions or connection errors, check .env and service status.
 
+
+## 2. Database changes.
+alembic revision --autogenerate -m "user role enum"
+alembic upgrade head

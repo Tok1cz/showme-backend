@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from app.db.enums import TextLength
-from app.db.base import Base
+from app.db.declarative_base import Base
 
 class TextPromptTemplate(Base):
     __tablename__ = "text_prompt_templates"

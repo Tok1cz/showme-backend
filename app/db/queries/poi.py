@@ -21,10 +21,10 @@ async def get_n_nearest_attractions(
             tags->'description' AS description,
             way AS geometry,
             GeometryType(way) as structure_type,
-            ST_X(ST_Centroid(way)) AS lon,
-            ST_Y(ST_Centroid(way)) AS lat,
+            ST_X(ST_Centroid(ST_Transform(way, 4326))) AS lon,
+            ST_Y(ST_Centroid(ST_Transform(way, 4326))) AS lat,
             ST_Distance(
-                way::geography,
+                ST_Transform(way, 4326)::geography,
                 ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography
             ) AS distance_m
         FROM (
@@ -54,8 +54,8 @@ async def get_poi_by_id(session, poi_id: int):
             tags->'description' AS description,
             way AS geometry,
             GeometryType(way) as structure_type,
-            ST_X(ST_Centroid(way)) AS lon,
-            ST_Y(ST_Centroid(way)) AS lat
+            ST_X(ST_Centroid(ST_Transform(way, 4326))) AS lon,
+            ST_Y(ST_Centroid(ST_Transform(way, 4326))) AS lat
         FROM (
             SELECT osm_id, name, tags, tags->'description' AS description, way FROM planet_osm_point WHERE osm_id = :poi_id
             UNION ALL
