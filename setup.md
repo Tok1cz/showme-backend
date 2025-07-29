@@ -128,3 +128,18 @@ nordvpn set meshnet on
   ```sh
   uvicorn app.main:app --host 0.0.0.0 --port 8000
   ```
+
+
+
+
+
+
+sudo apt install tmux
+Start a tmux or screen session:
+tmux new -s celery
+Run your Celery worker:
+celery -A app.celery_app:celery_app worker --loglevel=info
+Detach with Ctrl+b then d (for tmux).
+You can disconnect SSH. Later, SSH back in and reattach:
+tmux attach -t celery
+Stop Celery with Ctrl+C in the session.

@@ -26,6 +26,7 @@ alembic = "^1.16.4"
 fastapi-users = {extras = ["oauth", "sqlalchemy"], version = "^14.0.1"}
 fastapi-users-db-sqlalchemy = "^7.0.0"
 httpx-oauth = "^0.16.1"
+osmium = "^4.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

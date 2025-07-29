@@ -5,8 +5,9 @@ from alembic import context
 import os
 from dotenv import load_dotenv
 from app.core.settings import Settings  # adjust path if needed
+import app.db.base 
 from app.db.declarative_base import Base  # declarative_base with metadata
-import app.db.base  # ensure base is imported for metadata
+
 # Load .env
 load_dotenv()
 
