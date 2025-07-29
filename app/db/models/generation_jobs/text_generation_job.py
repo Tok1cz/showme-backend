@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from app.db.enums import GenerationJobStatus
-from app.db.base import Base
+from app.db.declarative_base import Base
 
 class TextGenerationJob(Base):
     __tablename__ = "text_generation_jobs"

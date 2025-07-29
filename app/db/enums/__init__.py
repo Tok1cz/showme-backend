@@ -6,3 +6,4 @@ from .generation_modality import GenerationModality
 from .enhancement_status import EnhancementStatus
 from .audio_quality import AudioQuality
 from .audio_length import AudioLength
+from .user_role import UserRole

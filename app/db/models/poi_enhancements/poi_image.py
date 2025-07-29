@@ -7,13 +7,14 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Boolean,
+    BigInteger
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from app.db.enums import EnhancementStatus, ImageResolution
 from sqlalchemy.dialects.postgresql import UUID
-from app.db.base import Base
+from app.db.declarative_base import Base
 
 
 class POIImage(Base):
@@ -21,7 +22,7 @@ class POIImage(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poi_id: Mapped[int] = mapped_column(
-        ForeignKey("planet_osm_point.osm_id"), nullable=False
+        BigInteger, nullable=False
     )
     filename: Mapped[str] = mapped_column(Text, nullable=True)
     image_url: Mapped[str] = mapped_column(Text, nullable=True)

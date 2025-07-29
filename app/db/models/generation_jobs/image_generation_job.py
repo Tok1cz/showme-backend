@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Enum, Text, DateTime, JSON, String
 from sqlalchemy.dialects.postgresql import UUID
-from app.db.base import Base
+from app.db.declarative_base import Base
 from app.db.enums import GenerationJobStatus
 
 class ImageGenerationJob(Base):

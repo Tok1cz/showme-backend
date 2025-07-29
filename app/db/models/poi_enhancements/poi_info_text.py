@@ -13,7 +13,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from app.db.enums import EnhancementStatus, TextLength
-from app.db.base import Base
+from app.db.declarative_base import Base
 from typing import Optional
 from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
 
@@ -22,16 +22,16 @@ class POIInfoText(Base):
     __tablename__ = "poi_info_texts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    poi_id: Mapped[int] = mapped_column(ForeignKey("planet_osm_point.osm_id"), nullable=False)
+    poi_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     info_text: Mapped[str] = mapped_column(Text, nullable=False)
-    prompt: Mapped[str] = mapped_column(Text)
-    source: Mapped[str] = mapped_column(Text)
+    prompt: Mapped[str] = mapped_column(Text, nullable=True)
+    source: Mapped[str] = mapped_column(Text, nullable=True)
     status: Mapped[EnhancementStatus] = mapped_column(Enum(EnhancementStatus, name="enhancement_status"), nullable=False, default=EnhancementStatus.active)
     text_length: Mapped[TextLength] = mapped_column(Enum(TextLength, name="text_length"), nullable=False, default=TextLength.medium)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False)
-    topic_id: Mapped[int] = mapped_column(ForeignKey("information_topics.id"))
-    style_id: Mapped[int] = mapped_column(ForeignKey("information_styles.id"))
+    topic_id: Mapped[int] = mapped_column(ForeignKey("information_topics.id"), nullable=True)
+    style_id: Mapped[int] = mapped_column(ForeignKey("information_styles.id"), nullable=True)
     audio_id: Mapped[int] = mapped_column(ForeignKey("poi_audio.id"), nullable=True)
     task_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("text_generation_jobs.task_id"), nullable=True)
     provider: Mapped[str] = mapped_column(Text, nullable=True, default="openai")

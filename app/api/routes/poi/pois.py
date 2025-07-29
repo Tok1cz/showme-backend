@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.db.session import get_session
 from app.db.queries.poi import get_n_nearest_attractions, get_poi_by_id
 from app.schemas.poi import AttractionList
+from app.services.auth.dependencies import get_current_user
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.get("/nearest")
