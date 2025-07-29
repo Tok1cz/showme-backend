@@ -47,7 +47,10 @@ async def create_api_key(
     session.add(api_key)
     await session.commit()
     await session.refresh(api_key)
-    return raw_key  # Show the user the raw key ONCE
+    return {
+        "api_key": raw_key,
+        "message": "This is the only time the API key will be displayed. Please store it securely."
+    }
 
 @router.delete("/{key_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def revoke_api_key(
