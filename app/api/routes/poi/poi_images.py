@@ -22,7 +22,6 @@ async def get_poi_image(
     resolution: ImageResolution = Query(ImageResolution.medium),
     session: AsyncSession = Depends(get_session),
 ):
-    print("resolution param in endpoint:", resolution, type(resolution))
     service = ImageGenerationService(session)
     if not aspect:
         aspect = ""

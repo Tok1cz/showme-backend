@@ -11,6 +11,9 @@ from app.db.enums import EnhancementStatus
 from app.services.media_storage import MediaStorage
 from app.core import settings
 import requests  # For downloading image data from URL, if needed
+import logging
+
+logger = logging.getLogger(__name__)
 
 @shared_task
 def generate_image_task(
@@ -69,7 +72,7 @@ def generate_image_task(
                 job.finished_at = datetime.utcnow() # type: ignore
             session.commit()
         except Exception as e:
-            print(e)
+            logger.warning("Exception in %s: %s", __name__, e, exc_info=True)
             session.query(POIImage).filter(
                 POIImage.poi_id == poi_id,
                 POIImage.style_id == style_id,

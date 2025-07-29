@@ -10,6 +10,9 @@ from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJo
 from app.services.generation.registry import registry
 from app.db.enums import GenerationJobStatus
 from app.services.media_storage import MediaStorage
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -77,7 +80,7 @@ def generate_audio_task(
                 job.finished_at = datetime.utcnow()  # type: ignore
             session.commit()
         except Exception as e:
-            print(e)
+            logger.warning("Exception in %s: %s", __name__, e, exc_info=True)
             session.query(POIAudio).filter(
                 POIAudio.poi_id == poi_id,
                 POIAudio.style_id == style_id,

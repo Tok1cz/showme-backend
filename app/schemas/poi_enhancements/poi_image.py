@@ -31,7 +31,6 @@ class POIImageOut(BaseModel):
 
 class POIImageCreate(BaseModel):
     poi_id: int
-    geometry_type: GeometryType
     filename: str
     resolution: ImageResolution
     style: Optional[str] = None
