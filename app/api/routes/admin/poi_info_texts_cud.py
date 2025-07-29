@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.db.queries.poi_info_texts import (
+from app.db.queries.poi_enhancements.poi_info_texts import (
     create_poi_info_text,
     update_poi_info_text,
     delete_poi_info_text,
     get_poi_info_text_by_id,
 )
-from app.schemas.poi_info_text import POIInfoTextCreate, POIInfoTextUpdate, POIInfoTextOut
+from app.schemas.poi_enhancements import POIInfoTextCreate, POIInfoTextUpdate, POIInfoTextOut
 from app.db.session import get_session
 
 router = APIRouter()

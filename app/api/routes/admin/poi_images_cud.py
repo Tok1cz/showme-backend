@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.db.queries.poi_images import (
+from app.db.queries.poi_enhancements.poi_images import (
     create_poi_image,
     update_poi_image,
     delete_poi_image,
@@ -8,7 +8,7 @@ from app.db.queries.poi_images import (
 )
 from app.core.settings import settings
 from app.db.session import get_session
-from app.schemas.poi_image import POIImageCreate, POIImageUpdate, POIImageOut
+from app.schemas.poi_enhancements import POIImageCreate, POIImageUpdate, POIImageOut
 from app.api.utils.serialize import serialize_poi_image
 
 router = APIRouter()

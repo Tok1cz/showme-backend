@@ -13,7 +13,6 @@ class OpenAITextProvider(TextGenerationProvider):
             max_tokens=kwargs.get("max_tokens", 10000),
             temperature=kwargs.get("temperature", 0.7),
         )
-        print(response.choices[0].message.content.strip())
         return response.choices[0].message.content.strip()
 
     async def get_available_models(self) -> list[str]:

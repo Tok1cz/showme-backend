@@ -2,55 +2,53 @@ from fastapi import APIRouter, Depends, Query, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.db.session import get_session
-from app.services.image_generation.service import ImageGenerationService
-from app.schemas.poi_enhancements import ImageStatusResponse, POIImageBatchRequest
+from app.services.audio_generation.service import AudioGenerationService
+from app.schemas.poi_enhancements import AudioStatusResponse, POIAudioBatchRequest
 from app.schemas.generation_jobs import GenerationJobStatusOut
-from app.db.enums import ImageResolution
-from app.db.models.generation_jobs.image_generation_job import ImageGenerationJob
+from app.db.enums import AudioQuality, AudioLength
+from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJob
 from typing import Optional, List
 
 router = APIRouter(
-    prefix="/poi-images",
+    prefix="/poi-audio-gen",
 )
 
 
-@router.get("/", response_model=ImageStatusResponse)
-async def get_poi_image(
+@router.get("/", response_model=AudioStatusResponse)
+async def get_poi_audio(
     poi_id: int = Query(...),
     style: str = Query(...),
-    aspect: Optional[str] = Query(None),
-    resolution: ImageResolution = Query(ImageResolution.medium),
+    quality: AudioQuality = Query(AudioQuality.medium),
+    length: AudioLength = Query(AudioLength.medium),
     session: AsyncSession = Depends(get_session),
 ):
-    service = ImageGenerationService(session)
-    if not aspect:
-        aspect = ""
-    result = await service.get_or_generate_image(
+    service = AudioGenerationService(session)
+    result = await service.get_or_generate_audio(
         poi_id=poi_id,
         style_name=style,
-        aspect_name=aspect,
-        resolution=resolution,
+        quality=quality,
+        length=length,
     )
     if isinstance(result, dict) and result.get("status") == "generating":
         return GenerationJobStatusOut(**result)
     if not result:
-        raise HTTPException(status_code=404, detail="Image not found or is generating")
+        raise HTTPException(status_code=404, detail="Audio not found or is generating")
     return result
 
 
-@router.post("/batch", response_model=List[ImageStatusResponse])
-async def batch_poi_images(
-    requests: List[POIImageBatchRequest] = Body(...),
+@router.post("/batch", response_model=List[AudioStatusResponse])
+async def batch_poi_audio(
+    requests: List[POIAudioBatchRequest] = Body(...),
     session: AsyncSession = Depends(get_session),
 ):
-    service = ImageGenerationService(session)
+    service = AudioGenerationService(session)
     results = []
     for req in requests:
-        result = await service.get_or_generate_image(
+        result = await service.get_or_generate_audio(
             poi_id=req.poi_id,
             style_name=req.style,
-            aspect_name=req.aspect or "default",
-            resolution=req.resolution or ImageResolution.medium,
+            quality=req.quality or AudioQuality.medium,
+            length=req.length or AudioLength.medium,
         )
         if isinstance(result, dict) and result.get("status") == "generating":
             results.append(GenerationJobStatusOut(**result))
@@ -60,11 +58,11 @@ async def batch_poi_images(
 
 
 @router.get("/status/{task_id}", response_model=GenerationJobStatusOut)
-async def get_image_generation_status(
+async def get_audio_generation_status(
     task_id: str,
     session: AsyncSession = Depends(get_session),
 ):
-    stmt = select(ImageGenerationJob).where(ImageGenerationJob.task_id == task_id)
+    stmt = select(AudioGenerationJob).where(AudioGenerationJob.task_id == task_id)
     result = await session.execute(stmt)
     job = result.scalar_one_or_none()
     if not job:

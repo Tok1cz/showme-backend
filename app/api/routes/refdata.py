@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
-from app.db.models.poi_models import InformationStyle, InformationTopic, ImageStyle
+from app.db.models.poi_enhancements import InformationStyle, InformationTopic, ImageStyle
 from app.db.session import get_session
 from app.schemas.refdata import RefDataOut
 

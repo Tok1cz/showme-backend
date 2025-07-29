@@ -3,14 +3,14 @@ from sqlalchemy import select, insert, update
 from uuid import uuid4
 from datetime import datetime
 
-from app.db.models.poi_models import POIInfoText
-from app.db.models.text_generation_job import TextGenerationJob
-from app.db.enums import GenerationJobStatus, TextLength
+from app.db.models.poi_enhancements import POIInfoText
+from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
+from app.db.enums import GenerationJobStatus, TextLength, EnhancementStatus
 from app.services.generation.prompt_builder import PromptBuilder
 from app.services.generation.registry import registry
-from app.db.queries.prompt_templates import get_prompt_template
+from app.db.queries.prompt_templates import get_text_prompt_template
 from app.tasks.text_generation import generate_info_text_task  # celery task
-from app.db.models.prompt_template import PromptTemplate
+from app.db.models.prompt_templates import TextPromptTemplate
 from app.db.queries.poi import get_poi_by_id
 from app.exceptions.db import NotFoundInDBError
 
@@ -51,13 +51,32 @@ class InfoTextService:
         info_text_row = result.scalars().first()
 
         if info_text_row is not None and not force:
-            if info_text_row.status == GenerationJobStatus.ready:
-                return info_text_row  
-            elif info_text_row.status == GenerationJobStatus.generating:
-                return {"status": "generating", "task_id": info_text_row.task_id}
+            # SSOT: If task_id is NULL and status is active, it's a manual/curated asset and always "ready"
+            if not info_text_row.task_id and info_text_row.status == EnhancementStatus.active:
+                return {
+                    "status": "ready",
+                    "info_text": info_text_row,
+                }
+            # If task_id is set, look up the job row for status
+            elif info_text_row.task_id:
+                job_stmt = select(TextGenerationJob).where(TextGenerationJob.task_id == info_text_row.task_id)
+                job_result = await self.session.execute(job_stmt)
+                job_row = job_result.scalars().first()
+                if job_row:
+                    return {
+                        "status": job_row.status,
+                        "task_id": info_text_row.task_id,
+                        "info_text": info_text_row
+                    }
+                # Fallback: If job row is missing, treat as generating (or handle as error)
+                return {
+                    "status": "generating",
+                    "task_id": info_text_row.task_id,
+                    "info_text": info_text_row
+                }
 
         # 2. Compose prompt
-        tmpl: PromptTemplate = await get_prompt_template(
+        tmpl: TextPromptTemplate = await get_text_prompt_template(
             self.session, provider, model, topic_id, style_id, prompt_version
         )
         if not tmpl:
@@ -71,13 +90,31 @@ class InfoTextService:
         task_id = str(uuid4())
         now = datetime.utcnow()
 
+        # 5. Create a job row
+        job = TextGenerationJob(
+            task_id=task_id,
+            payload={
+                "poi_id": poi_id,
+                "topic_id": topic_id,
+                "style_id": style_id,
+                "text_length": text_length,
+                "provider": provider,
+                "model": model,
+                "prompt": prompt,
+                "context_data": context_data,
+            },
+            status=GenerationJobStatus.generating,
+            created_at=now,
+        )
+        self.session.add(job)
+        await self.session.commit()
+
         # 4. Insert or update info_text row
         if info_text_row is not None:
             upd = (
                 update(POIInfoText)
                 .where(POIInfoText.id == info_text_row.id)
                 .values(
-                    status="generating",
                     prompt=prompt,
                     provider=provider,
                     model=model,
@@ -98,31 +135,14 @@ class InfoTextService:
                 provider=provider,
                 model=model,
                 prompt_version=tmpl.version,
-                status=GenerationJobStatus.generating,
+                status=EnhancementStatus.active,
                 task_id=task_id,
                 created_at=now,
                 updated_at=now,
             )
             await self.session.execute(ins)
-
-        # 5. Create a job row
-        job = TextGenerationJob(
-            task_id=task_id,
-            payload={
-                "poi_id": poi_id,
-                "topic_id": topic_id,
-                "style_id": style_id,
-                "text_length": text_length,
-                "provider": provider,
-                "model": model,
-                "prompt": prompt,
-                "context_data": context_data,
-            },
-            status="generating",
-            created_at=now,
-        )
-        self.session.add(job)
         await self.session.commit()
+
 
         # 6. Dispatch Celery task
         generate_info_text_task.delay(
@@ -152,11 +172,7 @@ class InfoTextService:
                 "poi_id": req["poi_id"],
                 "topic_id": req["topic_id"],
                 "style_id": req["style_id"],
-                "text_length": (
-                    str(req.get("text_length"))
-                    if req.get("text_length") is not None
-                    else ""
-                ),
+                "text_length": req.get("text_length", TextLength.medium),
                 "provider": provider,
                 "model": model,
                 "force": force,

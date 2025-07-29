@@ -2,7 +2,6 @@ def serialize_poi_image(img, base_image_url=None):
     return {
         "id": img.id,
         "poi_id": img.poi_id,
-        "geometry_type": img.geometry_type,
         "filename": img.filename,
         "resolution": img.resolution,
         "style": {
@@ -22,7 +21,6 @@ def serialize_poi_info_text(info):
     return {
         "id": info.id,
         "poi_id": info.poi_id,
-        "geometry_type": info.geometry_type,
         "info_text": info.info_text,
         "prompt": info.prompt,
         "topic": {

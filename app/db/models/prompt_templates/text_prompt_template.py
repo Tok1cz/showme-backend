@@ -1,14 +1,11 @@
-# app/db/models/prompt_template.py
-
 from sqlalchemy import Column, Integer, String, Text, DateTime, UniqueConstraint, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from app.db.enums import TextLength
+from app.db.base import Base
 
-Base = declarative_base()
-
-class PromptTemplate(Base):
-    __tablename__ = "prompt_templates"
+class TextPromptTemplate(Base):
+    __tablename__ = "text_prompt_templates"
 
     id = Column(Integer, primary_key=True)
     provider = Column(String, nullable=False)
