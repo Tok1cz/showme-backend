@@ -7,6 +7,7 @@ from app.db.models.poi_enhancements import POIInfoText
 from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
 from app.services.generation.registry import registry
 from app.db.enums import GenerationJobStatus
+from app.db.enums import EnhancementStatus  # add this import
 
 @shared_task
 def generate_info_text_task(
@@ -42,8 +43,7 @@ def generate_info_text_task(
                 POIInfoText.task_id == task_id
             ).update({
                 "info_text": info_text,
-                "status": GenerationJobStatus.ready,
-                "error_msg": None,
+                "status": EnhancementStatus.active,  # set enhancement status to active
                 "updated_at": datetime.utcnow(),
             })
             # Update Job
@@ -62,8 +62,7 @@ def generate_info_text_task(
                 POIInfoText.text_length == text_length,
                 POIInfoText.task_id == task_id
             ).update({
-                "status": "failed",
-                "error_msg": str(e),
+                "status": EnhancementStatus.inactive,  # set enhancement status to inactive on failure
                 "updated_at": datetime.utcnow(),
             })
             job = session.query(TextGenerationJob).filter_by(task_id=task_id).first()

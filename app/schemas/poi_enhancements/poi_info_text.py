@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 from pydantic import BaseModel
 from typing import Optional
 from app.db.enums import TextLength
@@ -38,7 +39,21 @@ class POIInfoTextOut(BaseModel):
     updated_at: Optional[datetime]
     text_length: Optional[TextLength] = None
     audio_id: Optional[int]   # or nested POIAudio if you want
-
+    task_id: Optional[UUID]
 
     class Config:
         orm_mode = True
+
+
+class InfoTextStatusResponse(BaseModel):
+    status: str
+    task_id: Optional[UUID] = None
+    info_text: Optional[POIInfoTextOut] = None
+
+
+class InfoTextBatchRequest(BaseModel):
+    poi_id: int
+    topic: str
+    style: str
+    text_length: Optional[TextLength] = None
+    force: bool = False

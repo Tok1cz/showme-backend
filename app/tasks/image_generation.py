@@ -7,6 +7,7 @@ from app.db.models.poi_enhancements import POIImage
 from app.db.models.generation_jobs.image_generation_job import ImageGenerationJob
 from app.services.generation.registry import registry
 from app.db.enums import GenerationJobStatus
+from app.db.enums import EnhancementStatus
 from app.services.media_storage import MediaStorage
 from app.core import settings
 import requests  # For downloading image data from URL, if needed
@@ -33,7 +34,7 @@ def generate_image_task(
 
             # Call async provider if needed
             if hasattr(provider_instance.generate, "__call__") and asyncio.iscoroutinefunction(provider_instance.generate):
-                result = asyncio.run(provider_instance.generate(prompt, model=model, **(context_data or {})))
+                result = asyncio.run(provider_instance.generate(prompt, model=model, **(context_data or {}))) # Pass kwargs size by resolution ..
             else:
                 result = provider_instance.generate(prompt, model=model, **(context_data or {}))
 
@@ -53,13 +54,12 @@ def generate_image_task(
                 POIImage.style_id == style_id,
                 POIImage.aspect_id == aspect_id,
                 POIImage.resolution == resolution,
-                POIImage.task_id == task_id # Well we need to update the data model again .. 
+                POIImage.task_id == task_id
             ).update({
                 "image_url": stored_url,
                 "filename": image_filename,
-                "status": GenerationJobStatus.ready,
-                "error_msg": None,
                 "updated_at": datetime.utcnow(),
+                "status": EnhancementStatus.active,  
             })
 
             if job:
@@ -77,9 +77,8 @@ def generate_image_task(
                 POIImage.resolution == resolution,
                 POIImage.task_id == task_id
             ).update({
-                "status": GenerationJobStatus.failed,
-                "error_msg": str(e),
                 "updated_at": datetime.utcnow(),
+                "status": EnhancementStatus.inactive,  # set enhancement status to inactive on failure
             })
             job = session.query(ImageGenerationJob).filter_by(task_id=task_id).first()
             if job:

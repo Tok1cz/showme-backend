@@ -3,8 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List, Union
 
 from app.db.session import get_session
-from app.schemas.poi_enhancements import POIInfoTextOut
+from app.schemas.poi_enhancements import InfoTextStatusResponse, InfoTextBatchRequest
 from app.schemas.generation_jobs import TextGenerationJobOut, GenerationJobStatusOut
+
 from app.services.text_generation.service import InfoTextService
 from app.db.enums import TextLength
 from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
@@ -13,12 +14,14 @@ from app.db.queries.refdata import (
     get_information_style_by_name,
 )
 
-router = APIRouter(prefix="/poi-info-texts", tags=["POIs"])
+router = APIRouter(
+    prefix="/poi-info-texts",
+)
 
 # --- SINGLE INFO TEXT ENDPOINT ---
 
 
-@router.get("/", response_model=Union[POIInfoTextOut, GenerationJobStatusOut])
+@router.get("/", response_model=InfoTextStatusResponse)
 async def get_info_text(
     poi_id: int = Query(...),
     topic: str = Query(..., description="Topic name"),
@@ -45,16 +48,16 @@ async def get_info_text(
     return result
 
 
-# --- BULK ENDPOINT ---
-class InfoTextBulkResponse(POIInfoTextOut):
-    status: str
-    task_id: Optional[str] = None
-    poi_id: int
+# # --- BULK ENDPOINT --- #Fix
+# class InfoTextBulkResponse(POIInfoTextOut):
+#     status: str
+#     task_id: Optional[str] = None
+#     poi_id: int
 
 
-@router.post("/batch", response_model=List[InfoTextBulkResponse])
+@router.post("/batch", response_model=List[InfoTextStatusResponse])
 async def batch_info_texts(
-    requests: List[dict],
+    requests: List[InfoTextBatchRequest],
     session: AsyncSession = Depends(get_session),
 ):
     service = InfoTextService(session)

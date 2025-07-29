@@ -6,6 +6,8 @@ from datetime import datetime
 from pydantic import BaseModel
 from app.schemas.refdata import RefDataOut
 from app.db.enums import EnhancementStatus, ImageResolution
+from uuid import UUID
+
 
 class POIImageOut(BaseModel):
     id: int
@@ -21,9 +23,11 @@ class POIImageOut(BaseModel):
     style: Optional[RefDataOut]
     aspect: Optional[RefDataOut]
     orphan: Optional[bool]
+    task_id: Optional[UUID]
 
     class Config:
         orm_mode = True
+
 
 class POIImageCreate(BaseModel):
     poi_id: int
@@ -47,4 +51,12 @@ class POIImageUpdate(BaseModel):
 
 
 class POIImageBatchRequest(BaseModel):
-    ids: List[int]
+    poi_id: int
+    style: str
+    aspect: Optional[str] = None
+    resolution: ImageResolution = ImageResolution.medium
+
+class ImageStatusResponse(BaseModel):
+    status: str
+    task_id: Optional[UUID] = None
+    image: Optional[POIImageOut] = None

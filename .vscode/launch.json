@@ -15,6 +15,13 @@
                 "--reload"
             ],
             "jinja": true
+        },
+        {
+            "name": "Celery Worker",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/run_celery_worker.py",
+            "console": "integratedTerminal"
         }
     ]
 }

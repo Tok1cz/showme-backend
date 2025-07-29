@@ -5,7 +5,7 @@ from app.db.enums import TextLength
 from app.db.base import Base
 
 class TextPromptTemplate(Base):
-    __tablename__ = "prompt_templates"
+    __tablename__ = "text_prompt_templates"
 
     id = Column(Integer, primary_key=True)
     provider = Column(String, nullable=False)

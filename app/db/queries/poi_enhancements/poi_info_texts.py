@@ -5,7 +5,6 @@ from sqlalchemy import update, delete
 from sqlalchemy.orm import joinedload
 
 from app.db.models.poi_enhancements import POIInfoText, InformationTopic, InformationStyle
-from app.db.enums import GeometryType
 
 # ---- Helper: Resolve topic/style name to ID ----
 
@@ -36,25 +35,25 @@ async def create_poi_info_text(
     session: AsyncSession,
     *,
     poi_id: int,
-    geometry_type: GeometryType,
     info_text: str,
     prompt: Optional[str] = None,
     topic: Optional[str] = "general",
     style: Optional[str] = None,
     source: Optional[str] = None,
-    status: Optional[str] = "ready",
+    status: Optional[str] = "active",
+    task_id: Optional[str] = None,
 ) -> POIInfoText:
     topic_id = await get_topic_id(session, topic)
     style_id = await get_style_id(session, style)
     new_info = POIInfoText(
         poi_id=poi_id,
-        geometry_type=geometry_type,
         info_text=info_text,
         prompt=prompt,
         topic_id=topic_id,
         style_id=style_id,
         source=source,
         status=status,
+        task_id=task_id,
     )
     session.add(new_info)
     await session.commit()

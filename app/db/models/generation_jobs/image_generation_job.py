@@ -12,4 +12,4 @@ class ImageGenerationJob(Base):
     created_at = Column(DateTime(timezone=True), nullable=False)
     finished_at = Column(DateTime(timezone=True))
     result = Column(JSON)
-    error_msg = Column(Text)
+    error_msg = Column(Text, nullable=True)

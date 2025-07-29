@@ -11,7 +11,7 @@ def register_providers():
         OpenAITextProvider(api_key=settings.OPEN_API_KEY, default_model="gpt-4o")
     )
     registry.register_image(
-        "openai",
+        "dalle",
         OpenAIImageProvider(api_key=settings.OPEN_API_KEY, default_model="dall-e-3")
     )
     registry.register_audio(

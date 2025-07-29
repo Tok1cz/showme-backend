@@ -57,10 +57,29 @@ class ImageGenerationService:
         image_row = result.scalars().first()
 
         if image_row is not None and not force:
-            if image_row.status == EnhancementStatus.active:
-                return image_row
-            elif image_row.status == GenerationJobStatus.generating:
-                return {"status": "generating", "task_id": image_row.task_id}
+            # SSOT: If task_id is NULL and status is active, it's a manual/curated asset and always "ready"
+            if not image_row.task_id and image_row.status == EnhancementStatus.active:
+                return {
+                    "status": "ready",
+                    "image": image_row,
+                }
+            # If task_id is set, look up the job row for status
+            elif image_row.task_id  and image_row.status == EnhancementStatus.active:
+                job_stmt = select(ImageGenerationJob).where(ImageGenerationJob.task_id == image_row.task_id)
+                job_result = await self.session.execute(job_stmt)
+                job_row = job_result.scalars().first()
+                if job_row:
+                    return {
+                        "status": job_row.status,
+                        "task_id": image_row.task_id,
+                        "image": image_row
+                    }
+                # Fallback: If job row is missing, treat as generating (or handle as error)
+                return {
+                    "status": "generating",
+                    "task_id": image_row.task_id,
+                    "image": image_row
+                }
 
         # 2. Compose prompt
         tmpl = await get_image_prompt_template(
@@ -73,40 +92,6 @@ class ImageGenerationService:
 
         task_id = str(uuid4())
         now = datetime.utcnow()
-
-        # 4. Insert or update image row
-        if image_row is not None:
-            upd = (
-                update(POIImage)
-                .where(POIImage.id == image_row.id)
-                .values(
-                    status=GenerationJobStatus.generating,
-                    prompt=prompt,
-                    provider=provider,
-                    model=model,
-                    prompt_version=tmpl.version,
-                    task_id=task_id,
-                    error_msg=None,
-                    updated_at=now,
-                )
-            )
-            await self.session.execute(upd)
-        else:
-            ins = insert(POIImage).values(
-                poi_id=poi_id,
-                style_id=style_id,
-                aspect_id=aspect_id,
-                resolution=resolution,
-                prompt=prompt,
-              #  provider=provider,
-            #    model=model,
-               # prompt_version=tmpl.version,
-                status=EnhancementStatus.active,
-               # task_id=task_id,
-                created_at=now,
-                updated_at=now,
-            )
-            await self.session.execute(ins)
 
         job = ImageGenerationJob(
             task_id=task_id,
@@ -125,6 +110,34 @@ class ImageGenerationService:
         )
         self.session.add(job)
         await self.session.commit()
+
+        # 4. Insert or update image row
+        if image_row is not None:
+            upd = (
+                update(POIImage)
+                .where(POIImage.id == image_row.id)
+                .values(
+                    prompt=prompt,
+                    task_id=task_id,
+                    updated_at=now,
+                )
+            )
+            await self.session.execute(upd)
+        else:
+            ins = insert(POIImage).values(
+                poi_id=poi_id,
+                style_id=style_id,
+                aspect_id=aspect_id,
+                resolution=resolution,
+                prompt=prompt,
+                status=EnhancementStatus.active,
+                task_id=task_id,
+                created_at=now,
+                updated_at=now,
+            )
+            await self.session.execute(ins)
+        await self.session.commit()
+
 
         # Dispatch Celery task
         generate_image_task.delay(

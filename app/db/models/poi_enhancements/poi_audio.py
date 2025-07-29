@@ -3,6 +3,7 @@ from sqlalchemy import Text, Integer, Boolean, ForeignKey, Enum, DateTime, Colum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 from app.db.enums import EnhancementStatus, AudioQuality, AudioLength
+from sqlalchemy.dialects.postgresql import UUID
 
 class POIAudio(Base):
     __tablename__ = "poi_audio"
@@ -20,10 +21,11 @@ class POIAudio(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     style_id: Mapped[int] = mapped_column(ForeignKey("information_styles.id"))
     orphan: Mapped[bool] = mapped_column(Boolean, default=False)
+    task_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("audio_generation_jobs.task_id"), nullable=True)
 
     # Relationships to helper/reference tables
     style = relationship("InformationStyle", lazy="joined")
-
+    audio_generation_job = relationship("AudioGenerationJob", lazy="joined", uselist=False, foreign_keys=[task_id])
 
 class AudioVoice(Base):
     __tablename__ = "audio_voices"

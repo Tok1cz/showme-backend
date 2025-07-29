@@ -12,6 +12,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from app.db.enums import EnhancementStatus, ImageResolution
+from sqlalchemy.dialects.postgresql import UUID
 from app.db.base import Base
 
 
@@ -48,9 +49,12 @@ class POIImage(Base):
     )
     orphan: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    task_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("image_generation_jobs.task_id"), nullable=True)
+
     # Relationships to helper/reference tables
     style = relationship("ImageStyle", lazy="joined")
     aspect = relationship("ImageAspect", lazy="joined")
+    image_generation_job = relationship("ImageGenerationJob", lazy="joined", uselist=False, foreign_keys=[task_id])
 
 
 class ImageStyle(Base):
