@@ -1,4 +1,4 @@
-# app/db/models/user.py
+# app/db/models/user/user.py
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from app.db.declarative_base import Base
 from sqlalchemy.orm import Mapped, mapped_column

@@ -15,7 +15,7 @@ class UserManager(BaseUserManager[User, int]):
     reset_password_token_secret = settings.JWT_SECRET
     verification_token_secret = settings.JWT_SECRET
 
-    # Add  custom logic here (optional)
+    # Add custom logic here (optional)
 
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)

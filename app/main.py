@@ -10,7 +10,7 @@ from app.api.routes.admin import admin_router
 from app.api.routes.admin.auth import api_keys
 from app.core.settings import settings
 from app.services.generation.providers import register_providers
-from fastapi.openapi.models import APIKey, APIKeyIn, SecuritySchemeType
+from fastapi.openapi.models import APIKey
 from fastapi.openapi.utils import get_openapi
 
 if settings.DEBUG:
