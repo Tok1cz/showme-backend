@@ -129,7 +129,10 @@ nordvpn set meshnet on
   uvicorn app.main:app --host 0.0.0.0 --port 8000
   ```
 
+Install 
+sudo apt install osm2pgsql
 
+trigger the osm import.
 
 
 
