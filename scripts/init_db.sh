@@ -17,5 +17,5 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
 
 # Install postgis if not exists
 sudo -u postgres psql -d $DB_NAME -tc "SELECT 1 FROM pg_extension WHERE extname = 'postgis'" | grep -q 1 || \
-  sudo -u postgres psql -d $DB_NAME -c "CREATE EXTENSION postgis;"
+  sudo -u postgres psql -d $DB_NAME -c "CREATE EXTENSION postgis;" || \
     sudo -u postgres psql -d $DB_NAME -c "CREATE EXTENSION hstore;"
