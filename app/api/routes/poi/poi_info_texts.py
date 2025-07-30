@@ -26,7 +26,7 @@ async def get_info_text(
     poi_id: int = Query(...),
     topic: str = Query(..., description="Topic name"),
     style: str = Query(..., description="Style name"),
-    text_length: Optional[TextLength] = Query(None),
+    text_length: Optional[TextLength] = Query(TextLength.medium),
     force: bool = Query(False),
     session: AsyncSession = Depends(get_session),
 ):

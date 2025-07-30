@@ -9,13 +9,13 @@ from app.services.generation.registry import registry
 from app.db.enums import GenerationJobStatus
 from app.db.enums import EnhancementStatus
 from app.services.media_storage import MediaStorage
-from app.core import settings
+from app.core.settings import settings
 import requests  # For downloading image data from URL, if needed
 import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task
+@shared_task(rate_limit='5/m')
 def generate_image_task(
     poi_id,
     style_id,
@@ -46,11 +46,10 @@ def generate_image_task(
             image_filename = f"image_{task_id}.png"
 
             # If using CDN/local, download image bytes and store via MediaStorage
-            if image_url and (settings.MEDIA_STORAGE_BACKEND != "local" or settings.MEDIA_STORAGE_BACKEND == "cdn"):
+            if image_url:
                 image_data = requests.get(image_url).content
                 stored_url = MediaStorage.save_image(image_filename, image_data)
-            else:
-                stored_url = image_url
+
 
             session.query(POIImage).filter(
                 POIImage.poi_id == poi_id,

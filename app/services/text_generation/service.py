@@ -58,7 +58,7 @@ class InfoTextService:
                     "info_text": info_text_row,
                 }
             # If task_id is set, look up the job row for status
-            elif info_text_row.task_id:
+            else:
                 job_stmt = select(TextGenerationJob).where(TextGenerationJob.task_id == info_text_row.task_id)
                 job_result = await self.session.execute(job_stmt)
                 job_row = job_result.scalars().first()
@@ -169,17 +169,15 @@ class InfoTextService:
         results = []
         for req in poi_requests:
             kwargs = {
-                "poi_id": req["poi_id"],
-                "topic_id": req["topic_id"],
-                "style_id": req["style_id"],
-                "text_length": req.get("text_length", TextLength.medium),
+                "poi_id": req.poi_id,
+
+                "style": req.style,
+                "text_length": req.text_length,
                 "provider": provider,
                 "model": model,
                 "force": force,
             }
-            prompt_version = req.get("prompt_version")
-            if isinstance(prompt_version, int):
-                kwargs["prompt_version"] = prompt_version
+
             out = await self.get_or_generate_info_text(**kwargs)
             results.append({"poi_id": req["poi_id"], **out})
         return results

@@ -24,7 +24,7 @@ class ImageGenerationService:
         *,
         poi_id: int,
         style_name: str,
-        aspect_name: str = None,
+        aspect_name: str = "default",
         resolution: ImageResolution = ImageResolution.medium,
         provider: str = "dalle",
         model: str = "dall-e-3",
@@ -64,7 +64,7 @@ class ImageGenerationService:
                     "image": image_row,
                 }
             # If task_id is set, look up the job row for status
-            elif image_row.task_id  and image_row.status == EnhancementStatus.active:
+            else:
                 job_stmt = select(ImageGenerationJob).where(ImageGenerationJob.task_id == image_row.task_id)
                 job_result = await self.session.execute(job_stmt)
                 job_row = job_result.scalars().first()
