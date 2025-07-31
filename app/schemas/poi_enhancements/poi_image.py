@@ -59,3 +59,4 @@ class ImageStatusResponse(BaseModel):
     status: str
     task_id: Optional[UUID] = None
     image: Optional[POIImageOut] = None
+    poi_id: Optional[int] = None

@@ -61,6 +61,7 @@ class ImageGenerationService:
             if not image_row.task_id and image_row.status == EnhancementStatus.active:
                 return {
                     "status": "ready",
+                    "poi_id": image_row.poi_id,
                     "image": image_row,
                 }
             # If task_id is set, look up the job row for status
@@ -71,13 +72,15 @@ class ImageGenerationService:
                 if job_row:
                     return {
                         "status": job_row.status,
-                        "task_id": image_row.task_id,
+                        "task_id": job_row.task_id,
+                        "poi_id": image_row.poi_id,
                         "image": image_row
                     }
                 # Fallback: If job row is missing, treat as generating (or handle as error)
                 return {
                     "status": "generating",
                     "task_id": image_row.task_id,
+                    "poi_id": image_row.poi_id,
                     "image": image_row
                 }
 
@@ -95,6 +98,7 @@ class ImageGenerationService:
 
         job = ImageGenerationJob(
             task_id=task_id,
+            poi_id=poi_id,
             payload={
                 "poi_id": poi_id,
                 "style_id": style_id,
@@ -152,4 +156,4 @@ class ImageGenerationService:
             context_data=context_data or {},
         )
 
-        return {"status": "generating", "task_id": task_id}
+        return {"status": "generating", "task_id": task_id, "poi_id": poi_id}

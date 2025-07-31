@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Enum, Text, DateTime, JSON, String
+from sqlalchemy import BigInteger, Column, Enum, Text, DateTime, JSON, String
 from sqlalchemy.dialects.postgresql import UUID
 from app.db.declarative_base import Base
 from app.db.enums import GenerationJobStatus
@@ -13,3 +13,5 @@ class ImageGenerationJob(Base):
     finished_at = Column(DateTime(timezone=True))
     result = Column(JSON)
     error_msg = Column(Text, nullable=True)
+    poi_id = Column(BigInteger, nullable=True)
+    

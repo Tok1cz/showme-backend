@@ -56,6 +56,7 @@ class InfoTextService:
                 return {
                     "status": "ready",
                     "info_text": info_text_row,
+                    "poi_id": poi_id,
                 }
             # If task_id is set, look up the job row for status
             else:
@@ -66,12 +67,14 @@ class InfoTextService:
                     return {
                         "status": job_row.status,
                         "task_id": info_text_row.task_id,
+                        "poi_id": poi_id,
                         "info_text": info_text_row
                     }
                 # Fallback: If job row is missing, treat as generating (or handle as error)
                 return {
                     "status": "generating",
                     "task_id": info_text_row.task_id,
+                    "poi_id": poi_id,
                     "info_text": info_text_row
                 }
 
@@ -157,27 +160,21 @@ class InfoTextService:
             context_data=context_data or {},
         )
 
-        return {"status": "generating", "task_id": task_id}
+        return {"status": "generating", "task_id": task_id, "poi_id": poi_id}
 
     async def bulk_get_or_generate_info_texts(
         self,
         poi_requests: list[dict],
-        provider: str = "openai",
-        model: str = "gpt-4o",
-        force: bool = False,
     ):
         results = []
         for req in poi_requests:
-            kwargs = {
-                "poi_id": req.poi_id,
-
-                "style": req.style,
-                "text_length": req.text_length,
-                "provider": provider,
-                "model": model,
-                "force": force,
-            }
-
-            out = await self.get_or_generate_info_text(**kwargs)
-            results.append({"poi_id": req["poi_id"], **out})
+            result = await self.get_or_generate_info_text(
+                poi_id=req["poi_id"],
+                topic_id=req["topic_id"],
+                style_id=req["style_id"],
+                text_length=req.get("text_length", TextLength.medium),
+                force=req.get("force", False),
+                prompt_version=req.get("prompt_version", 1),
+            )
+            results.append(result)
         return results

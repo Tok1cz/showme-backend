@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, JSON, Enum
+from sqlalchemy import Column, String, DateTime, JSON, Enum, BigInteger, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -9,6 +9,7 @@ class TextGenerationJob(Base):
     __tablename__ = "text_generation_jobs"
 
     task_id = Column(PG_UUID(as_uuid=True), primary_key=True)
+    poi_id = Column(BigInteger, nullable=True)
     payload = Column(JSON, nullable=False)
     status = Column(
     Enum(GenerationJobStatus, name="generation_job_status"),

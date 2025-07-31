@@ -8,6 +8,7 @@ from app.db.enums import GenerationJobStatus
 class TextGenerationJobOut(BaseModel):
     task_id: UUID
     payload: dict[str, Any]
+    poi_id: Optional[int] = None
     status: GenerationJobStatus
     created_at: datetime
     finished_at: Optional[datetime] = None

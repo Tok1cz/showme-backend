@@ -8,3 +8,4 @@ from app.db.enums import GenerationJobStatus
 class GenerationJobStatusOut(BaseModel):
     status: GenerationJobStatus  # "generating", "failed", etc.
     task_id: Optional[UUID] = None
+    poi_id: Optional[int] = None

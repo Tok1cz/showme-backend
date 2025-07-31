@@ -70,4 +70,5 @@ async def get_image_generation_status(
     return GenerationJobStatusOut(
         status=job.status.value if hasattr(job.status, "value") else str(job.status),
         task_id=job.task_id,
+        poi_id=job.poi_id,
     )
