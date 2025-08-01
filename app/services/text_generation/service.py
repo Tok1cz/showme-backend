@@ -26,7 +26,7 @@ class InfoTextService:
         style_id: int,
         text_length: TextLength = TextLength.medium,
         provider: str = "openai",
-        model: str = "gpt-4o",
+        model: str = "o4-mini",
         force: bool = False,
         prompt_version: int = 1,
     ):
