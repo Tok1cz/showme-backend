@@ -48,6 +48,7 @@ class POIInfoTextOut(BaseModel):
 class InfoTextStatusResponse(BaseModel):
     status: str
     task_id: Optional[UUID] = None
+    poi_id: int
     info_text: Optional[POIInfoTextOut] = None
 
 

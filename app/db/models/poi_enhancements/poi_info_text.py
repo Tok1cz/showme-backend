@@ -23,7 +23,7 @@ class POIInfoText(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     poi_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    info_text: Mapped[str] = mapped_column(Text, nullable=False)
+    info_text: Mapped[str] = mapped_column(Text, nullable=True)
     prompt: Mapped[str] = mapped_column(Text, nullable=True)
     source: Mapped[str] = mapped_column(Text, nullable=True)
     status: Mapped[EnhancementStatus] = mapped_column(Enum(EnhancementStatus, name="enhancement_status"), nullable=False, default=EnhancementStatus.active)

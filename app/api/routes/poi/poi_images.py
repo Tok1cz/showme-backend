@@ -52,10 +52,8 @@ async def batch_poi_images(
             aspect_name=req.aspect or "default",
             resolution=req.resolution or ImageResolution.medium,
         )
-        if isinstance(result, dict) and result.get("status") == "generating":
-            results.append(GenerationJobStatusOut(**result))
-        else:
-            results.append(result)
+
+        results.append(result)
     return results
 
 
@@ -72,4 +70,5 @@ async def get_image_generation_status(
     return GenerationJobStatusOut(
         status=job.status.value if hasattr(job.status, "value") else str(job.status),
         task_id=job.task_id,
+        poi_id=job.poi_id,
     )

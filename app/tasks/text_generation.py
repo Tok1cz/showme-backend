@@ -12,7 +12,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task
+@shared_task(rate_limit='5/m')
 def generate_info_text_task(
     poi_id,
     topic_id,

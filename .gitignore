@@ -222,3 +222,5 @@ setup.txt
 .context/
 audio/
 .secrets
+*.csv
+*.sql
