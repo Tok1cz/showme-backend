@@ -54,7 +54,7 @@ while IFS= read -r table || [[ -n "$table" ]]; do
 
   # Test this on test db!
   # Apply SQL on remote
-  ssh -i "$SSH_KEY" "$REMOTE_HOST" "psql -U $USER -d $REMOTE_DB -f /tmp/${table}_sync.sql && rm /tmp/${table}_sync.sql"
+  ssh -i "$SSH_KEY" "$REMOTE_HOST" "sudo -u postgres psql -U $USER -d $REMOTE_DB -f /tmp/${table}_sync.sql && rm /tmp/${table}_sync.sql"
 
   echo "✅ Synced $table"
   rm "$SQL_FILE"
