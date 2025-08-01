@@ -1,5 +1,5 @@
 """TODO:
-Refactor with poi_id in Respnser"""
+Refactor with poi_id in Responder"""
 
 from fastapi import APIRouter, Depends, Query, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
