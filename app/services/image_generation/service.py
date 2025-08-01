@@ -27,7 +27,7 @@ class ImageGenerationService:
         aspect_name: str = "default",
         resolution: ImageResolution = ImageResolution.medium,
         provider: str = "dalle",
-        model: str = "dall-e-3",
+        model: str = "dall-e-2",
         force: bool = False,
         prompt_version: int = 1,
     ):

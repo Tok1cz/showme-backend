@@ -27,13 +27,14 @@ echo "Truncate enabled: $TRUNCATE_FIRST"
 echo
 
 # Loop through each table
-while IFS= read -r table || [[ -n "$table" ]]; do
+while IFS= read -r table; do
+  [[ -z "$table" ]] && continue
   echo "Syncing table: $table"
 
-  SQL_FILE="/tmp/${table}_sync.sql"
+  SQL_FILE="./${table}_sync.sql"
   echo "SQL file: $SQL_FILE"
   # Start SQL file
-  touch $SQL_FILE
+  #touch $SQL_FILE
   echo "-- Syncing $table" > "$SQL_FILE"
 
   # add optional TRUNCATE statement
@@ -47,17 +48,24 @@ while IFS= read -r table || [[ -n "$table" ]]; do
   # Add ON CONFLICT clause for idempotency
   # This is crude: relies on INSERT ... VALUES ... format of --column-inserts
   # and assumes a primary key is defined
-  sed -i "s/);$/) ON CONFLICT DO NOTHING;/" "$SQL_FILE"
+ # sed -i "s/);$/) ON CONFLICT DO NOTHING;/" "$SQL_FILE"
 
   # Transfer SQL to remote
   scp -i "$SSH_KEY" "$SQL_FILE" "$REMOTE_HOST:/tmp/${table}_sync.sql"
 
   # Test this on test db!
   # Apply SQL on remote
-  ssh -i "$SSH_KEY" "$REMOTE_HOST" "sudo -u postgres psql -U $USER -d $REMOTE_DB -f /tmp/${table}_sync.sql && rm /tmp/${table}_sync.sql"
-
-  echo "✅ Synced $table"
-  rm "$SQL_FILE"
+  REMOTE_CMD="sudo -u postgres psql -U $USER -d $REMOTE_DB -f /tmp/${table}_sync.sql && rm /tmp/${table}_sync.sql"
+  ssh -n -i "$SSH_KEY" "$REMOTE_HOST" "$REMOTE_CMD" > /tmp/${table}_ssh_stdout.log 2> /tmp/${table}_ssh_stderr.log
+  SSH_EXIT_CODE=$?
+  cat /tmp/${table}_ssh_stdout.log
+  cat /tmp/${table}_ssh_stderr.log
+  if [[ $SSH_EXIT_CODE -ne 0 ]]; then
+    echo "❌ Error syncing $table (exit code $SSH_EXIT_CODE)"
+  else
+    echo "✅ Synced $table"
+  fi
+ rm "$SQL_FILE"
 
 done < "$TABLE_FILE"
 
