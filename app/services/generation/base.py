@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseGenerationProvider(ABC):
     @abstractmethod
     async def generate(self, prompt: str, **kwargs):

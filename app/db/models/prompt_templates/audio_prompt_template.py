@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+
 from app.db.declarative_base import Base
+
 
 class AudioPromptTemplate(Base):
     __tablename__ = "audio_prompt_templates"

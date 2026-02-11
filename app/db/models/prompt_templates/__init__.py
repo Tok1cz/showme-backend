@@ -1,3 +1,3 @@
-from .text_prompt_template import TextPromptTemplate
 from .audio_prompt_template import AudioPromptTemplate
 from .image_prompt_template import ImagePromptTemplate
+from .text_prompt_template import TextPromptTemplate

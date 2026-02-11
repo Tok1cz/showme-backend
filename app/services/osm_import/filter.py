@@ -1,21 +1,31 @@
 import logging
-import osmium
+import os
 from pathlib import Path
 from typing import Dict, Set
-import os
+
+import osmium
 
 from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
 # Filtering tag sets (should match your current logic)
-TOURISM_VALUES = {"attraction", "monument", "memorial", "museum", "artwork", "viewpoint"}
+TOURISM_VALUES = {
+    "attraction",
+    "monument",
+    "memorial",
+    "museum",
+    "artwork",
+    "viewpoint",
+}
 NATURAL_VALUES = {"peak", "waterfall", "cliff", "bay", "cave_entrance"}
 AMENITY_VALUES = {"restaurant", "pub", "cafe"}
 SHOP_VALUES = {"brewery", "distillery"}
 
+
 class FirstPassHandler(osmium.SimpleHandler):
     """Collect all attraction node/way/relation IDs and referenced node IDs."""
+
     def __init__(self, log_prefix=""):
         super().__init__()
         self.attraction_ways = []
@@ -54,9 +64,18 @@ class FirstPassHandler(osmium.SimpleHandler):
                 if m.type == "n":
                     self.referenced_node_ids.add(m.ref)
 
+
 class SecondPassWriter(osmium.SimpleHandler):
     """Write out all relevant nodes, ways, and relations to the filtered file."""
-    def __init__(self, writer, node_ids: Set[int], way_ids: Set[int], relation_ids: Set[int], referenced_node_ids: Set[int]):
+
+    def __init__(
+        self,
+        writer,
+        node_ids: Set[int],
+        way_ids: Set[int],
+        relation_ids: Set[int],
+        referenced_node_ids: Set[int],
+    ):
         super().__init__()
         self.writer = writer
         self.node_ids = set(node_ids) | set(referenced_node_ids)
@@ -74,6 +93,7 @@ class SecondPassWriter(osmium.SimpleHandler):
     def relation(self, r):
         if r.id in self.relation_ids:
             self.writer.add_relation(r)
+
 
 def filter_osm_file(input_path: Path, output_path: Path, log_prefix="") -> None:
     """Filter a single .osm.pbf file, keeping only attractions + refs."""
@@ -102,6 +122,7 @@ def filter_osm_file(input_path: Path, output_path: Path, log_prefix="") -> None:
     writer.close()
     logger.info("%sFinished filtering file: %s", log_prefix, output_path)
 
+
 def filter_osm_files(file_map: Dict[str, Path]) -> Dict[str, Path]:
     """
     Given a mapping of region -> raw .osm.pbf Path,
@@ -120,7 +141,9 @@ def filter_osm_files(file_map: Dict[str, Path]) -> Dict[str, Path]:
                 in_path.unlink()
                 logger.info("%sDeleted original file: %s", log_prefix, in_path)
             except Exception as del_err:
-                logger.warning("%sFailed to delete original: %s (%s)", log_prefix, in_path, del_err)
+                logger.warning(
+                    "%sFailed to delete original: %s (%s)", log_prefix, in_path, del_err
+                )
         except Exception as e:
             logger.error("%sFilter failed: %s", log_prefix, e)
             raise

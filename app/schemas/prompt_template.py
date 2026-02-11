@@ -1,6 +1,8 @@
-from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+
+from pydantic import BaseModel
+
 from app.db.enums import TextLength
 
 
@@ -17,6 +19,7 @@ class PromptTemplateBase(BaseModel):
 class PromptTemplateCreate(PromptTemplateBase):
     pass
 
+
 class PromptTemplateUpdate(BaseModel):
     provider: Optional[str] = None
     model: Optional[str] = None
@@ -24,6 +27,7 @@ class PromptTemplateUpdate(BaseModel):
     style_id: Optional[int] = None
     version: Optional[int] = None
     template: Optional[str] = None
+
 
 class PromptTemplateOut(PromptTemplateBase):
     id: int

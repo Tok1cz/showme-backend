@@ -1,12 +1,12 @@
 from fastapi import Depends
 from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import CookieTransport, AuthenticationBackend
+from fastapi_users.authentication import AuthenticationBackend, CookieTransport
 from httpx_oauth.clients.google import GoogleOAuth2
 
-from app.db.session import get_session
-from app.db.models.user.user import User
-from app.db.models.auth.oauth_account import OAuthAccount
 from app.core.settings import settings
+from app.db.models.auth.oauth_account import OAuthAccount
+from app.db.models.user.user import User
+from app.db.session import get_session
 from app.services.auth.user_manager import get_user_manager
 
 cookie_transport = CookieTransport(cookie_name="auth", cookie_max_age=3600)
@@ -26,4 +26,3 @@ fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
     [],
 )
-

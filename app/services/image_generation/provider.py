@@ -1,5 +1,7 @@
 from abc import abstractmethod
+
 from app.services.generation.base import BaseGenerationProvider
+
 
 class ImageGenerationProvider(BaseGenerationProvider):
     @abstractmethod

@@ -1,6 +1,8 @@
 from datetime import datetime
-from typing import Optional, Any, Dict, List
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
+
 
 class OSMImportLogOut(BaseModel):
     id: int
@@ -13,7 +15,7 @@ class OSMImportLogOut(BaseModel):
     record_count: Optional[int]
     error: Optional[str]
     notes: Optional[str]
-    
+
     class Config:
         orm_mode = True
 
@@ -21,6 +23,7 @@ class OSMImportLogOut(BaseModel):
 class OSMImportJobSubmitOut(BaseModel):
     status: str  # e.g. "submitted"
     task_id: str
+
 
 class OSMImportJobStatusOut(BaseModel):
     task_id: str

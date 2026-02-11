@@ -1,17 +1,20 @@
-from sqlalchemy import BigInteger, Column, Enum, Text, DateTime, JSON, String
+from sqlalchemy import JSON, BigInteger, Column, DateTime, Enum, String, Text
 from sqlalchemy.dialects.postgresql import UUID
+
 from app.db.declarative_base import Base
 from app.db.enums import GenerationJobStatus
+
 
 class ImageGenerationJob(Base):
     __tablename__ = "image_generation_jobs"
 
     task_id = Column(UUID(as_uuid=True), primary_key=True)
     payload = Column(JSON, nullable=False)
-    status = Column(Enum(GenerationJobStatus, name="generation_job_status"), nullable=False)
+    status = Column(
+        Enum(GenerationJobStatus, name="generation_job_status"), nullable=False
+    )
     created_at = Column(DateTime(timezone=True), nullable=False)
     finished_at = Column(DateTime(timezone=True))
     result = Column(JSON)
     error_msg = Column(Text, nullable=True)
     poi_id = Column(BigInteger, nullable=True)
-    

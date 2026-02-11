@@ -1,9 +1,9 @@
 # app/db/models/user/user.py
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from app.db.declarative_base import Base
+from sqlalchemy import Boolean, Enum, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, Boolean, Integer, Enum
 
+from app.db.declarative_base import Base
 from app.db.enums.user_role import UserRole
 
 
@@ -14,4 +14,3 @@ class User(SQLAlchemyBaseUserTable, Base):
         Enum(UserRole, name="user_role"), nullable=False, default=UserRole.user.value
     )
     consent_given: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-

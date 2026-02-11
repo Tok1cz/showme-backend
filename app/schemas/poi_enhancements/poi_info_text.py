@@ -1,10 +1,11 @@
 from datetime import datetime
-from uuid import UUID
-from pydantic import BaseModel
 from typing import Optional
-from app.db.enums import TextLength
+from uuid import UUID
+
+from pydantic import BaseModel
+
+from app.db.enums import EnhancementStatus, TextLength
 from app.schemas.refdata import RefDataOut
-from app.db.enums import EnhancementStatus
 
 
 class POIInfoTextCreate(BaseModel):
@@ -17,6 +18,7 @@ class POIInfoTextCreate(BaseModel):
     status: Optional[EnhancementStatus] = EnhancementStatus.active
     text_length: Optional[TextLength] = None
 
+
 class POIInfoTextUpdate(BaseModel):
     info_text: Optional[str] = None
     prompt: Optional[str] = None
@@ -25,6 +27,7 @@ class POIInfoTextUpdate(BaseModel):
     source: Optional[str] = None
     status: Optional[EnhancementStatus] = None
     text_length: Optional[TextLength] = None
+
 
 class POIInfoTextOut(BaseModel):
     id: int
@@ -38,7 +41,7 @@ class POIInfoTextOut(BaseModel):
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
     text_length: Optional[TextLength] = None
-    audio_id: Optional[int]   # or nested POIAudio if you want
+    audio_id: Optional[int]  # or nested POIAudio if you want
     task_id: Optional[UUID]
 
     class Config:

@@ -2,6 +2,7 @@
 
 from jinja2 import Template
 
+
 class PromptBuilder:
     def __init__(self, template_str: str):
         self.template = Template(template_str)

@@ -1,4 +1,5 @@
 import logging
+
 from sqlalchemy import create_engine, text
 
 from app.core.settings import settings
@@ -6,16 +7,8 @@ from app.core.settings import settings
 logger = logging.getLogger(__name__)
 
 ENRICHMENT_TABLES = [
-    {
-        "table": "poi_info_texts",
-        "poi_id_col": "poi_id",
-        "geom_col": "geometry_type"
-    },
-    {
-        "table": "poi_images",
-        "poi_id_col": "poi_id",
-        "geom_col": "geometry_type"
-    },
+    {"table": "poi_info_texts", "poi_id_col": "poi_id", "geom_col": "geometry_type"},
+    {"table": "poi_images", "poi_id_col": "poi_id", "geom_col": "geometry_type"},
     # Add future enrichment tables here, e.g.:
     # {"table": "poi_audiofiles", "poi_id_col": "poi_id", "geom_col": "geometry_type"},
 ]
@@ -27,6 +20,7 @@ PLANET_OSM_TABLES = {
     "MULTIPOLYGON": "planet_osm_polygon",
     "MULTILINESTRING": "planet_osm_line",
 }
+
 
 def update_orphan_flags(db_url: str = None):
     """
@@ -52,7 +46,9 @@ def update_orphan_flags(db_url: str = None):
             # Set orphan = TRUE if referenced OSM object does NOT exist
             # Only update those not already orphaned
             for geom_type, planet_table in PLANET_OSM_TABLES.items():
-                upd = conn.execute(text(f"""
+                upd = conn.execute(
+                    text(
+                        f"""
                     UPDATE {tab}
                     SET orphan = TRUE
                     WHERE {geom_col} = :geom_type
@@ -61,13 +57,20 @@ def update_orphan_flags(db_url: str = None):
                         SELECT 1 FROM {planet_table}
                         WHERE {planet_table}.osm_id = {tab}.{poi_col}
                       )
-                """), {"geom_type": geom_type})
+                """
+                    ),
+                    {"geom_type": geom_type},
+                )
                 orphans += upd.rowcount or 0
-                logger.info("Orphaned %d rows in %s for %s", upd.rowcount or 0, tab, geom_type)
+                logger.info(
+                    "Orphaned %d rows in %s for %s", upd.rowcount or 0, tab, geom_type
+                )
 
             # Set orphan = FALSE if referenced OSM object now exists again (record was previously orphaned)
             for geom_type, planet_table in PLANET_OSM_TABLES.items():
-                upd = conn.execute(text(f"""
+                upd = conn.execute(
+                    text(
+                        f"""
                     UPDATE {tab}
                     SET orphan = FALSE
                     WHERE {geom_col} = :geom_type
@@ -76,8 +79,22 @@ def update_orphan_flags(db_url: str = None):
                         SELECT 1 FROM {planet_table}
                         WHERE {planet_table}.osm_id = {tab}.{poi_col}
                       )
-                """), {"geom_type": geom_type})
+                """
+                    ),
+                    {"geom_type": geom_type},
+                )
                 unorphans += upd.rowcount or 0
-                logger.info("Un-orphaned %d rows in %s for %s", upd.rowcount or 0, tab, geom_type)
+                logger.info(
+                    "Un-orphaned %d rows in %s for %s",
+                    upd.rowcount or 0,
+                    tab,
+                    geom_type,
+                )
 
-            logger.info("Orphan check complete for %s: %d orphaned, %d un-orphaned, %d total", tab, orphans, unorphans, total)
+            logger.info(
+                "Orphan check complete for %s: %d orphaned, %d un-orphaned, %d total",
+                tab,
+                orphans,
+                unorphans,
+                total,
+            )

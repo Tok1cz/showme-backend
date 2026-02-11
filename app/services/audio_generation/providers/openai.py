@@ -1,15 +1,20 @@
 # app/services/audio_generation/provider.py
 
 from typing import Optional
+
 from openai import AsyncOpenAI
+
 from app.services.audio_generation.provider import AudioGenerationProvider
+
 
 class OpenAIAudioProvider(AudioGenerationProvider):
     def __init__(self, api_key: str, default_model: str = "tts-1"):
         self.client = AsyncOpenAI(api_key=api_key)
         self.default_model = default_model
 
-    async def generate(self, prompt: str, model: str = None, voice: Optional[str] = None, **kwargs) -> bytes:
+    async def generate(
+        self, prompt: str, model: str = None, voice: Optional[str] = None, **kwargs
+    ) -> bytes:
         response = await self.client.audio.speech.create(
             model=model or self.default_model,
             input=prompt,

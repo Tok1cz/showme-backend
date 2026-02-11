@@ -1,9 +1,12 @@
-from sqlalchemy import Column, String, DateTime, JSON, Enum, BigInteger, ForeignKey
+from datetime import datetime
+
+from sqlalchemy import JSON, BigInteger, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
-from app.db.enums import GenerationJobStatus
+
 from app.db.declarative_base import Base
+from app.db.enums import GenerationJobStatus
+
 
 class TextGenerationJob(Base):
     __tablename__ = "text_generation_jobs"
@@ -12,11 +15,11 @@ class TextGenerationJob(Base):
     poi_id = Column(BigInteger, nullable=True)
     payload = Column(JSON, nullable=False)
     status = Column(
-    Enum(GenerationJobStatus, name="generation_job_status"),
-    default=GenerationJobStatus.ready,
-    server_default=GenerationJobStatus.ready,
-    nullable=False,
-)
+        Enum(GenerationJobStatus, name="generation_job_status"),
+        default=GenerationJobStatus.ready,
+        server_default=GenerationJobStatus.ready,
+        nullable=False,
+    )
     created_at = Column(DateTime, default=datetime.utcnow)
     finished_at = Column(DateTime, nullable=True)
     result = Column(JSON, nullable=True)

@@ -7,10 +7,14 @@ from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class OSMMergeError(Exception):
     pass
 
-def merge_osm_files(filtered_file_map: Dict[str, Path], merged_filename: str = "merged-latest.osm.pbf") -> Path:
+
+def merge_osm_files(
+    filtered_file_map: Dict[str, Path], merged_filename: str = "merged-latest.osm.pbf"
+) -> Path:
     """
     Merges all filtered .osm.pbf files into a single .osm.pbf for import.
     Deletes filtered input files after merging.
@@ -42,6 +46,8 @@ def merge_osm_files(filtered_file_map: Dict[str, Path], merged_filename: str = "
             p.unlink()
             logger.info("Deleted filtered file for %s: %s", region, p)
         except Exception as del_err:
-            logger.warning("Failed to delete filtered file for %s: %s (%s)", region, p, del_err)
+            logger.warning(
+                "Failed to delete filtered file for %s: %s (%s)", region, p, del_err
+            )
 
     return merged_path

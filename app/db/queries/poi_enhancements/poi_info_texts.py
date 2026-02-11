@@ -1,14 +1,22 @@
 from typing import List, Optional
+
+from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import update, delete
 from sqlalchemy.orm import joinedload
 
-from app.db.models.poi_enhancements import POIInfoText, InformationTopic, InformationStyle
+from app.db.models.poi_enhancements import (
+    InformationStyle,
+    InformationTopic,
+    POIInfoText,
+)
 
 # ---- Helper: Resolve topic/style name to ID ----
 
-async def get_topic_id(session: AsyncSession, topic_name: Optional[str]) -> Optional[int]:
+
+async def get_topic_id(
+    session: AsyncSession, topic_name: Optional[str]
+) -> Optional[int]:
     if not topic_name:
         return None
     result = await session.execute(
@@ -19,7 +27,10 @@ async def get_topic_id(session: AsyncSession, topic_name: Optional[str]) -> Opti
         raise ValueError(f"Unknown topic: {topic_name}")
     return topic.id
 
-async def get_style_id(session: AsyncSession, style_name: Optional[str]) -> Optional[int]:
+
+async def get_style_id(
+    session: AsyncSession, style_name: Optional[str]
+) -> Optional[int]:
     if not style_name:
         return None
     result = await session.execute(
@@ -29,6 +40,7 @@ async def get_style_id(session: AsyncSession, style_name: Optional[str]) -> Opti
     if not style:
         raise ValueError(f"Unknown style: {style_name}")
     return style.id
+
 
 # ---- Create ----
 async def create_poi_info_text(
@@ -60,6 +72,7 @@ async def create_poi_info_text(
     await session.refresh(new_info)
     return new_info
 
+
 # ---- Read (get all for a POI) ----
 async def get_poi_info_texts(
     session: AsyncSession,
@@ -78,8 +91,11 @@ async def get_poi_info_texts(
     result = await session.execute(stmt)
     return result.scalars().all()
 
+
 # ---- Read by ID ----
-async def get_poi_info_text_by_id(session: AsyncSession, info_id: int) -> Optional[POIInfoText]:
+async def get_poi_info_text_by_id(
+    session: AsyncSession, info_id: int
+) -> Optional[POIInfoText]:
     stmt = (
         select(POIInfoText)
         .options(joinedload(POIInfoText.topic), joinedload(POIInfoText.style))
@@ -88,11 +104,10 @@ async def get_poi_info_text_by_id(session: AsyncSession, info_id: int) -> Option
     result = await session.execute(stmt)
     return result.scalars().first()
 
+
 # ---- Update ----
 async def update_poi_info_text(
-    session: AsyncSession,
-    info_id: int,
-    **kwargs
+    session: AsyncSession, info_id: int, **kwargs
 ) -> Optional[POIInfoText]:
     # Convert topic/style from name to ID if present
     if "topic" in kwargs and kwargs["topic"] is not None:
@@ -108,6 +123,7 @@ async def update_poi_info_text(
     await session.execute(stmt)
     await session.commit()
     return await get_poi_info_text_by_id(session, info_id)
+
 
 # ---- Delete ----
 async def delete_poi_info_text(session: AsyncSession, info_id: int) -> None:

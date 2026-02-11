@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, Body
+from typing import List, Optional
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db.session import get_session
-from app.services.image_generation.service import ImageGenerationService
-from app.schemas.poi_enhancements import ImageStatusResponse, POIImageBatchRequest
-from app.schemas.generation_jobs import GenerationJobStatusOut
+
 from app.db.enums import ImageResolution
 from app.db.models.generation_jobs.image_generation_job import ImageGenerationJob
-from typing import Optional, List
+from app.db.session import get_session
+from app.schemas.generation_jobs import GenerationJobStatusOut
+from app.schemas.poi_enhancements import ImageStatusResponse, POIImageBatchRequest
+from app.services.image_generation.service import ImageGenerationService
 
 router = APIRouter(
     prefix="/poi_images",

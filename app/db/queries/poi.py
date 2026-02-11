@@ -1,7 +1,8 @@
 # app/db/queries.py
-from sqlalchemy import text, select
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
+
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 # N nearest attractions to a given lat/lon, with optional tag filtering
@@ -42,7 +43,6 @@ async def get_n_nearest_attractions(
     )
     rows = result.mappings().all()
     return rows
-
 
 
 async def get_poi_by_id(session, poi_id: int):

@@ -1,13 +1,19 @@
 import enum  # stdlib
-from sqlalchemy import Column, Integer, String, DateTime, JSON, Enum as SQLEnum
-from sqlalchemy.sql import func
+
+from sqlalchemy import JSON, Column, DateTime
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
+
 from app.db.declarative_base import Base
+
 
 class OSMImportStatus(enum.Enum):  # Use stdlib enum.Enum here
     started = "started"
     completed = "completed"
     failed = "failed"
+
 
 class OSMImportLog(Base):
     __tablename__ = "osm_import_log"

@@ -1,29 +1,27 @@
 from sqlalchemy import (
+    BigInteger,
+    Boolean,
     Column,
-    Integer,
-    String,
-    Text,
     DateTime,
     Enum,
     ForeignKey,
-    Boolean,
-    BigInteger
+    Integer,
+    String,
+    Text,
 )
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import relationship, mapped_column, Mapped
-from app.db.enums import EnhancementStatus, ImageResolution
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import func
+
 from app.db.declarative_base import Base
+from app.db.enums import EnhancementStatus, ImageResolution
 
 
 class POIImage(Base):
     __tablename__ = "poi_images"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    poi_id: Mapped[int] = mapped_column(
-        BigInteger, nullable=False
-    )
+    poi_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     filename: Mapped[str] = mapped_column(Text, nullable=True)
     image_url: Mapped[str] = mapped_column(Text, nullable=True)
     prompt: Mapped[str] = mapped_column(Text, nullable=True)
@@ -50,12 +48,16 @@ class POIImage(Base):
     )
     orphan: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    task_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("image_generation_jobs.task_id"), nullable=True)
+    task_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("image_generation_jobs.task_id"), nullable=True
+    )
 
     # Relationships to helper/reference tables
     style = relationship("ImageStyle", lazy="joined")
     aspect = relationship("ImageAspect", lazy="joined")
-    image_generation_job = relationship("ImageGenerationJob", lazy="joined", uselist=False, foreign_keys=[task_id])
+    image_generation_job = relationship(
+        "ImageGenerationJob", lazy="joined", uselist=False, foreign_keys=[task_id]
+    )
 
 
 class ImageStyle(Base):

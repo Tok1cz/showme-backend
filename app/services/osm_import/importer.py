@@ -7,13 +7,13 @@ from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class OSMImportError(Exception):
     pass
 
+
 def import_osm_to_temp_tables(
-    merged_file: Path,
-    db_url: str = None,
-    table_prefix: str = "planet_osm_new"
+    merged_file: Path, db_url: str = None, table_prefix: str = "planet_osm_new"
 ) -> None:
     """
     Imports the merged OSM file into Postgres temp tables using osm2pgsql.
@@ -26,25 +26,30 @@ def import_osm_to_temp_tables(
     # Parse DB connection info from settings (or override)
     # Assumes DB URL is like: postgres://user:password@host:port/dbname
     from urllib.parse import urlparse
+
     db_url = db_url or settings.DATABASE_URL_SYNCH
     parsed = urlparse(db_url)
 
-    dbname = parsed.path.lstrip('/')
+    dbname = parsed.path.lstrip("/")
     dbuser = parsed.username
     dbhost = parsed.hostname
     dbport = parsed.port or 5432
     dbpassword = parsed.password
 
-
     cmd = [
         "osm2pgsql",
         "--create",
         "--slim",
-        "--database", dbname,
-        "-U", dbuser,  # -U is correct!
-        "--host", dbhost,
-        "--port", str(dbport),
-        "--prefix", table_prefix,
+        "--database",
+        dbname,
+        "-U",
+        dbuser,  # -U is correct!
+        "--host",
+        dbhost,
+        "--port",
+        str(dbport),
+        "--prefix",
+        table_prefix,
         "--hstore",
         str(merged_file),
     ]
@@ -53,10 +58,14 @@ def import_osm_to_temp_tables(
         env["PGPASSWORD"] = dbpassword
 
     # Prompt for password only if needed (or use .pgpass for CI/prod)
-    logger.info("Importing merged OSM file into temp tables with prefix '%s'", table_prefix)
+    logger.info(
+        "Importing merged OSM file into temp tables with prefix '%s'", table_prefix
+    )
     logger.debug("Running command: %s", " ".join(cmd))
     try:
-        result = subprocess.run(cmd, capture_output=True, check=True, text=True, env=env)
+        result = subprocess.run(
+            cmd, capture_output=True, check=True, text=True, env=env
+        )
         logger.info("osm2pgsql import completed: %s", result.stdout.strip())
     except subprocess.CalledProcessError as e:
         logger.error("osm2pgsql failed: %s\n%s", e, e.stderr)

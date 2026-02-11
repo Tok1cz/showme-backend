@@ -1,16 +1,18 @@
 """TODO:
 Refactor with poi_id in Responder"""
 
-from fastapi import APIRouter, Depends, Query, HTTPException, Body
+from typing import List, Optional
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db.session import get_session
-from app.services.audio_generation.service import AudioGenerationService
-from app.schemas.poi_enhancements import AudioStatusResponse, POIAudioBatchRequest
-from app.schemas.generation_jobs import GenerationJobStatusOut
-from app.db.enums import AudioQuality, AudioLength
+
+from app.db.enums import AudioLength, AudioQuality
 from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJob
-from typing import Optional, List
+from app.db.session import get_session
+from app.schemas.generation_jobs import GenerationJobStatusOut
+from app.schemas.poi_enhancements import AudioStatusResponse, POIAudioBatchRequest
+from app.services.audio_generation.service import AudioGenerationService
 
 router = APIRouter(
     prefix="/poi-audio",

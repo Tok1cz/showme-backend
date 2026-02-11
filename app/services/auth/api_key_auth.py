@@ -1,16 +1,19 @@
-from fastapi import Depends, HTTPException, status, Request
+import hashlib
+from datetime import datetime, timezone
+
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from datetime import datetime, timezone
-import hashlib
 
-from app.db.session import get_session
+from app.core.settings import settings
 from app.db.models.auth.api_key import APIKey
 from app.db.models.user.user import User
-from app.core.settings import settings
+from app.db.session import get_session
+
 
 def hash_api_key(raw_key: str) -> str:
     return hashlib.sha256(raw_key.encode()).hexdigest()
+
 
 async def get_user_by_api_key(
     request: Request,

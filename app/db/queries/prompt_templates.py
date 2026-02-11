@@ -1,7 +1,14 @@
 from typing import Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db.models.prompt_templates import TextPromptTemplate, ImagePromptTemplate, AudioPromptTemplate
+
+from app.db.models.prompt_templates import (
+    AudioPromptTemplate,
+    ImagePromptTemplate,
+    TextPromptTemplate,
+)
+
 
 # Existing function (Text)
 async def get_text_prompt_template(
@@ -10,13 +17,13 @@ async def get_text_prompt_template(
     model: str,
     topic_id: int,
     style_id: int,
-    version: Optional[int] = None
+    version: Optional[int] = None,
 ):
     stmt = select(TextPromptTemplate).where(
         TextPromptTemplate.provider == provider,
         TextPromptTemplate.model == model,
         TextPromptTemplate.topic_id == topic_id,
-        TextPromptTemplate.style_id == style_id
+        TextPromptTemplate.style_id == style_id,
     )
     if version:
         stmt = stmt.where(TextPromptTemplate.version == version)
@@ -25,6 +32,7 @@ async def get_text_prompt_template(
     result = await session.execute(stmt)
     return result.scalars().first()
 
+
 # New: Image prompt template
 async def get_image_prompt_template(
     session: AsyncSession,
@@ -32,12 +40,12 @@ async def get_image_prompt_template(
     model: str,
     style_id: int,
     aspect_id: Optional[int] = None,
-    version: Optional[int] = None
+    version: Optional[int] = None,
 ):
     stmt = select(ImagePromptTemplate).where(
         ImagePromptTemplate.provider == provider,
         ImagePromptTemplate.model == model,
-        ImagePromptTemplate.style_id == style_id
+        ImagePromptTemplate.style_id == style_id,
     )
     if aspect_id:
         stmt = stmt.where(ImagePromptTemplate.aspect_id == aspect_id)
@@ -48,18 +56,19 @@ async def get_image_prompt_template(
     result = await session.execute(stmt)
     return result.scalars().first()
 
+
 # New: Audio prompt template
 async def get_audio_prompt_template(
     session: AsyncSession,
     provider: str,
     model: str,
     voice_id: int,
-    version: Optional[int] = None
+    version: Optional[int] = None,
 ):
     stmt = select(AudioPromptTemplate).where(
         AudioPromptTemplate.provider == provider,
         AudioPromptTemplate.model == model,
-        AudioPromptTemplate.voice_id == voice_id
+        AudioPromptTemplate.voice_id == voice_id,
     )
     if version:
         stmt = stmt.where(AudioPromptTemplate.version == version)

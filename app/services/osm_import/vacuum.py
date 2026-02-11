@@ -1,14 +1,16 @@
 import logging
+
 from sqlalchemy import create_engine, text
 
 from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 def vacuum_analyze_osm_tables(
     db_url: str = None,
     table_prefix: str = "planet_osm",
-    table_types = ("point", "line", "polygon")
+    table_types=("point", "line", "polygon"),
 ):
     """
     Runs VACUUM ANALYZE on all OSM data tables after a swap/import.

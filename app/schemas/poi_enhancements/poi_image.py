@@ -1,12 +1,11 @@
-from typing import List, Optional
-from pydantic import BaseModel
-from app.db.enums import ImageResolution
-from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
-from app.schemas.refdata import RefDataOut
-from app.db.enums import EnhancementStatus, ImageResolution
+from typing import List, Optional
 from uuid import UUID
+
+from pydantic import BaseModel
+
+from app.db.enums import EnhancementStatus, ImageResolution
+from app.schemas.refdata import RefDataOut
 
 
 class POIImageOut(BaseModel):
@@ -54,6 +53,7 @@ class POIImageBatchRequest(BaseModel):
     style: str
     aspect: Optional[str] = None
     resolution: ImageResolution = ImageResolution.medium
+
 
 class ImageStatusResponse(BaseModel):
     status: str
