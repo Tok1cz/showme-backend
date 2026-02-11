@@ -9,7 +9,6 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)  # type: ignore
 
 
-# Dependency to get a session for FastAPI
 async def get_session() -> AsyncSession:  # type: ignore
     async with AsyncSessionLocal() as session:  # type: ignore
         yield session  # type: ignore
