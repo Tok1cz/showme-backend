@@ -1,14 +1,17 @@
 import logging
-import requests
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
+
+import requests
 
 from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class OSMDownloadError(Exception):
     pass
+
 
 def ensure_import_dir() -> Path:
     """Ensure the OSM import directory exists (cross-platform, idempotent)."""
@@ -18,16 +21,22 @@ def ensure_import_dir() -> Path:
         import_dir.mkdir(parents=True, exist_ok=True)
     return import_dir
 
+
 def build_download_url(region: str) -> str:
     """Builds the OSM download URL for the given region."""
-    return "%s%s/%s-latest.osm.pbf" % (settings.OSM_BASE_URL, settings.CONTINENT, region)
+    return "%s%s/%s-latest.osm.pbf" % (
+        settings.OSM_BASE_URL,
+        settings.CONTINENT,
+        region,
+    )
+
 
 def download_file(url: str, dest_path: Path, chunk_size: int = 8192) -> None:
     """Streams a file from url to dest_path. Raises OSMDownloadError on fail."""
     try:
         with requests.get(url, stream=True, timeout=120) as resp:
             resp.raise_for_status()
-            with open(dest_path, 'wb') as f:
+            with open(dest_path, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=chunk_size):
                     if chunk:
                         f.write(chunk)
@@ -35,6 +44,7 @@ def download_file(url: str, dest_path: Path, chunk_size: int = 8192) -> None:
     except Exception as e:
         logger.error("Download failed for %s: %s", url, e)
         raise OSMDownloadError("Failed to download %s: %s" % (url, e))
+
 
 def fetch_osm_files(regions: List[str] = None) -> Dict[str, Path]:
     """

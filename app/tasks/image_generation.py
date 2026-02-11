@@ -1,17 +1,18 @@
-from celery import shared_task
 import asyncio
-from sqlalchemy.orm import Session
-from datetime import datetime
-from app.db.session import SyncSessionLocal
-from app.db.models.poi_enhancements import POIImage
-from app.db.models.generation_jobs.image_generation_job import ImageGenerationJob
-from app.services.generation.registry import registry
-from app.db.enums import GenerationJobStatus
-from app.db.enums import EnhancementStatus
-from app.services.media_storage import MediaStorage
-from app.core.settings import settings
-import requests  # For downloading image data from URL, if needed
 import logging
+from datetime import datetime
+
+import requests  # For downloading image data from URL, if needed
+from celery import shared_task
+from sqlalchemy.orm import Session
+
+from app.core.settings import settings
+from app.db.enums import EnhancementStatus, GenerationJobStatus
+from app.db.models.generation_jobs.image_generation_job import ImageGenerationJob
+from app.db.models.poi_enhancements import POIImage
+from app.db.session import SyncSessionLocal
+from app.services.generation.registry import registry
+from app.services.media_storage import MediaStorage
 
 logger = logging.getLogger(__name__)
 

@@ -5,4 +5,3 @@ class GenerationJobStatus(str, Enum):
     ready = "ready"
     generating = "generating"
     failed = "failed"
-

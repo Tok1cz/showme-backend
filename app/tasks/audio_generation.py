@@ -1,16 +1,18 @@
-from celery import shared_task
 import asyncio
-from sqlalchemy.orm import Session
+import logging
 from datetime import datetime
+
+from celery import shared_task
+from sqlalchemy.orm import Session
+
+from app.db.enums import GenerationJobStatus
 from app.db.enums.enhancement_status import EnhancementStatus
+from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJob
+from app.db.models.poi_enhancements import POIAudio
 from app.db.models.poi_enhancements.poi_audio import AudioVoice
 from app.db.session import SyncSessionLocal
-from app.db.models.poi_enhancements import POIAudio
-from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJob
 from app.services.generation.registry import registry
-from app.db.enums import GenerationJobStatus
 from app.services.media_storage import MediaStorage
-import logging
 
 logger = logging.getLogger(__name__)
 

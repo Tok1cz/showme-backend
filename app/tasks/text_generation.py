@@ -1,14 +1,15 @@
-from celery import shared_task
 import asyncio
-from sqlalchemy.orm import Session
-from datetime import datetime
-from app.db.session import SyncSessionLocal
-from app.db.models.poi_enhancements import POIInfoText
-from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
-from app.services.generation.registry import registry
-from app.db.enums import GenerationJobStatus
-from app.db.enums import EnhancementStatus
 import logging
+from datetime import datetime
+
+from celery import shared_task
+from sqlalchemy.orm import Session
+
+from app.db.enums import EnhancementStatus, GenerationJobStatus
+from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
+from app.db.models.poi_enhancements import POIInfoText
+from app.db.session import SyncSessionLocal
+from app.services.generation.registry import registry
 
 logger = logging.getLogger(__name__)
 

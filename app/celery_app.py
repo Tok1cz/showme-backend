@@ -1,9 +1,10 @@
 from celery import Celery
+
+import app.tasks.audio_generation
+import app.tasks.image_generation
+import app.tasks.text_generation
 from app.core.settings import settings
 from app.services.generation.providers import register_providers
-import app.tasks.text_generation
-import app.tasks.image_generation
-import app.tasks.audio_generation
 
 celery_app = Celery(
     "osm_import",

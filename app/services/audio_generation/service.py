@@ -1,24 +1,25 @@
 # app/services/audio_generation/service.py
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, update
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
 
-from app.db.models.poi_enhancements import POIAudio
-from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJob
+from sqlalchemy import insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.db.enums import (
-    GenerationJobStatus,
-    AudioQuality,
     AudioLength,
+    AudioQuality,
     EnhancementStatus,
+    GenerationJobStatus,
 )
-from app.services.generation.prompt_builder import PromptBuilder
-from app.services.generation.registry import registry
-from app.db.queries.prompt_templates import get_audio_prompt_template
+from app.db.models.generation_jobs.audio_generation_job import AudioGenerationJob
+from app.db.models.poi_enhancements import POIAudio
 from app.db.queries.poi import get_poi_by_id
 from app.db.queries.poi_enhancements.poi_audio import get_style_id as get_audio_style_id
+from app.db.queries.prompt_templates import get_audio_prompt_template
 from app.exceptions.db import NotFoundInDBError
+from app.services.generation.prompt_builder import PromptBuilder
+from app.services.generation.registry import registry
 from app.tasks.audio_generation import generate_audio_task  # celery task
 
 
@@ -88,7 +89,7 @@ class AudioGenerationService:
                     "task_id": audio_row.task_id,
                     "audio": audio_row,
                 }
-        # This doesnt make sense, 
+        # This doesnt make sense,
         # Lets use the information text of this POI/ audio directly as prompt.
         tmpl = await get_audio_prompt_template(
             self.session, provider, model, voice_id, prompt_version

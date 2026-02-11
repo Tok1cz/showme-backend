@@ -1,7 +1,9 @@
 # app/services/image_generation/provider.py
 
 from openai import AsyncOpenAI
+
 from app.services.image_generation.provider import ImageGenerationProvider
+
 
 class OpenAIImageProvider(ImageGenerationProvider):
     def __init__(self, api_key: str, default_model: str = "dall-e-3"):
@@ -14,8 +16,8 @@ class OpenAIImageProvider(ImageGenerationProvider):
             prompt=prompt,
             n=kwargs.get("n", 1),  # number of images to generate
             size=kwargs.get("size", "1024x1024"),
-           # quality=kwargs.get("quality", "standard"), not in dall-e.2
-       #     style=kwargs.get("style", None),
+            # quality=kwargs.get("quality", "standard"), not in dall-e.2
+            #     style=kwargs.get("style", None),
         )
         # Typically you'll want to return the image URL and possibly base64 content
         # Here, just return the full response for extensibility

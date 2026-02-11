@@ -1,26 +1,25 @@
 import logging
 import shutil
-from pathlib import Path
 import traceback
 from datetime import datetime
+from pathlib import Path
 
-from app.core.settings import settings
-from app.db.models.log_models import OSMImportLog, OSMImportStatus
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.celery_app import celery_app
-
+from app.core.settings import settings
+from app.db.models.log_models import OSMImportLog, OSMImportStatus
+from app.services.osm_import.cleanup import cleanup_old_files, cleanup_old_osm_tables
 from app.services.osm_import.downloader import fetch_osm_files
 from app.services.osm_import.filter import filter_osm_files
-from app.services.osm_import.merge import merge_osm_files
 from app.services.osm_import.importer import import_osm_to_temp_tables
-from app.services.osm_import.validator import validate_imported_tables
-from app.services.osm_import.swapper import swap_osm_tables
+from app.services.osm_import.merge import merge_osm_files
 from app.services.osm_import.orphan_check import update_orphan_flags
-from app.services.osm_import.vacuum import vacuum_analyze_osm_tables
-from app.services.osm_import.cleanup import cleanup_old_osm_tables, cleanup_old_files
 from app.services.osm_import.preimport_cleanup import preimport_cleanup
+from app.services.osm_import.swapper import swap_osm_tables
+from app.services.osm_import.vacuum import vacuum_analyze_osm_tables
+from app.services.osm_import.validator import validate_imported_tables
 
 logger = logging.getLogger(__name__)
 

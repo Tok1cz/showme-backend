@@ -1,8 +1,11 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, UniqueConstraint, Enum
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-from app.db.enums import TextLength
+
+from sqlalchemy import Column, DateTime, Enum, Integer, String, Text, UniqueConstraint
+from sqlalchemy.ext.declarative import declarative_base
+
 from app.db.declarative_base import Base
+from app.db.enums import TextLength
+
 
 class TextPromptTemplate(Base):
     __tablename__ = "text_prompt_templates"
@@ -18,5 +21,12 @@ class TextPromptTemplate(Base):
     text_length = Column(Enum(TextLength, name="text_length"), nullable=True)
 
     __table_args__ = (
-        UniqueConstraint("provider", "model", "topic_id", "style_id", "version", name="uq_prompt_template"),
+        UniqueConstraint(
+            "provider",
+            "model",
+            "topic_id",
+            "style_id",
+            "version",
+            name="uq_prompt_template",
+        ),
     )

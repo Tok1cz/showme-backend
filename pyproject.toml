@@ -38,3 +38,6 @@ pytest-postgresql = "*"
 black = "*"
 isort = "*"
 mypy = "*"
+
+[tool.isort]
+profile = "black"

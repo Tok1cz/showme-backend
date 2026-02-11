@@ -6,4 +6,3 @@ class TextLength(str, Enum):
     medium = "medium"
     long = "long"
     very_long = "very_long"
-

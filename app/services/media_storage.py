@@ -1,5 +1,6 @@
 from app.core.settings import settings
 
+
 def upload_to_cdn(filename: str, data: bytes) -> str:
     # Upload to S3, GCS, etc.
     # Return the CDN/public URL for the uploaded file.

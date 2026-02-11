@@ -1,17 +1,18 @@
 import logging
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from fastapi.staticfiles import StaticFiles
-from app.api.routes import health, refdata
-from app.api.routes.auth import auth
-from app.api.routes.poi import poi_router
-from app.api.routes.admin import admin_router
-from app.api.routes.admin.auth import api_keys
-from app.core.settings import settings
-from app.services.generation.providers import register_providers
+from fastapi import FastAPI
 from fastapi.openapi.models import APIKey
 from fastapi.openapi.utils import get_openapi
+from fastapi.staticfiles import StaticFiles
+
+from app.api.routes import health, refdata
+from app.api.routes.admin import admin_router
+from app.api.routes.admin.auth import api_keys
+from app.api.routes.auth import auth
+from app.api.routes.poi import poi_router
+from app.core.settings import settings
+from app.services.generation.providers import register_providers
 
 if settings.DEBUG:
     logging.basicConfig(level=logging.DEBUG)

@@ -1,18 +1,20 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, update
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
 
-from app.db.models.poi_enhancements import POIInfoText
+from sqlalchemy import insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.enums import EnhancementStatus, GenerationJobStatus, TextLength
 from app.db.models.generation_jobs.text_generation_job import TextGenerationJob
-from app.db.enums import GenerationJobStatus, TextLength, EnhancementStatus
-from app.services.generation.prompt_builder import PromptBuilder
-from app.services.generation.registry import registry
-from app.db.queries.prompt_templates import get_text_prompt_template
-from app.tasks.text_generation import generate_info_text_task  # celery task
+from app.db.models.poi_enhancements import POIInfoText
 from app.db.models.prompt_templates import TextPromptTemplate
 from app.db.queries.poi import get_poi_by_id
+from app.db.queries.prompt_templates import get_text_prompt_template
 from app.exceptions.db import NotFoundInDBError
+from app.services.generation.prompt_builder import PromptBuilder
+from app.services.generation.registry import registry
+from app.tasks.text_generation import generate_info_text_task  # celery task
+
 
 class InfoTextService:
     def __init__(self, session: AsyncSession):
@@ -33,12 +35,12 @@ class InfoTextService:
         poi = await get_poi_by_id(self.session, poi_id)
         if not poi:
             raise NotFoundInDBError(f"POI with id {poi_id} not found")
-    
+
         context_data = {
             "name": poi["name"],
             "lat": poi["lat"],
             "lon": poi["lon"],
-            "description": poi["description"],  
+            "description": poi["description"],
         }
         # 1. DB lookup for existing info_text
         stmt = select(POIInfoText).where(
@@ -52,7 +54,10 @@ class InfoTextService:
 
         if info_text_row is not None and not force:
             # SSOT: If task_id is NULL and status is active, it's a manual/curated asset and always "ready"
-            if not info_text_row.task_id and info_text_row.status == EnhancementStatus.active:
+            if (
+                not info_text_row.task_id
+                and info_text_row.status == EnhancementStatus.active
+            ):
                 return {
                     "status": "ready",
                     "info_text": info_text_row,
@@ -60,7 +65,9 @@ class InfoTextService:
                 }
             # If task_id is set, look up the job row for status
             else:
-                job_stmt = select(TextGenerationJob).where(TextGenerationJob.task_id == info_text_row.task_id)
+                job_stmt = select(TextGenerationJob).where(
+                    TextGenerationJob.task_id == info_text_row.task_id
+                )
                 job_result = await self.session.execute(job_stmt)
                 job_row = job_result.scalars().first()
                 if job_row:
@@ -68,14 +75,14 @@ class InfoTextService:
                         "status": job_row.status,
                         "task_id": info_text_row.task_id,
                         "poi_id": poi_id,
-                        "info_text": info_text_row
+                        "info_text": info_text_row,
                     }
                 # Fallback: If job row is missing, treat as generating (or handle as error)
                 return {
                     "status": "generating",
                     "task_id": info_text_row.task_id,
                     "poi_id": poi_id,
-                    "info_text": info_text_row
+                    "info_text": info_text_row,
                 }
 
         # 2. Compose prompt
@@ -145,7 +152,6 @@ class InfoTextService:
             )
             await self.session.execute(ins)
         await self.session.commit()
-
 
         # 6. Dispatch Celery task
         generate_info_text_task.delay(

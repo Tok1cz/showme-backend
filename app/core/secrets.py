@@ -1,5 +1,8 @@
 import os
+
 from app.core.settings import settings
+
+
 # Not sure if this is needed...
 def get_secret(key: str) -> str:
     """

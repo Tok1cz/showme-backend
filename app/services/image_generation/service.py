@@ -1,19 +1,26 @@
 # app/services/image_generation/service.py
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, update
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
 
-from app.db.models.poi_enhancements import POIImage
+from sqlalchemy import insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.enums import EnhancementStatus, GenerationJobStatus, ImageResolution
 from app.db.models.generation_jobs.image_generation_job import ImageGenerationJob
-from app.db.enums import GenerationJobStatus, ImageResolution, EnhancementStatus
-from app.services.generation.prompt_builder import PromptBuilder
-from app.db.queries.prompt_templates import get_image_prompt_template
+from app.db.models.poi_enhancements import POIImage
 from app.db.queries.poi import get_poi_by_id
-from app.db.queries.poi_enhancements.poi_images import get_style_id as get_image_style_id, get_aspect_id
+from app.db.queries.poi_enhancements.poi_images import (
+    get_aspect_id,
+)
+from app.db.queries.poi_enhancements.poi_images import (
+    get_style_id as get_image_style_id,
+)
+from app.db.queries.prompt_templates import get_image_prompt_template
 from app.exceptions.db import NotFoundInDBError
+from app.services.generation.prompt_builder import PromptBuilder
 from app.tasks.image_generation import generate_image_task  # celery task
+
 
 class ImageGenerationService:
     def __init__(self, session: AsyncSession):
@@ -34,10 +41,12 @@ class ImageGenerationService:
         poi = await get_poi_by_id(self.session, poi_id)
         if not poi:
             raise NotFoundInDBError(f"POI with id {poi_id} not found")
-        
+
         # ---- Resolve style and aspect names to IDs here ----
         style_id = await get_image_style_id(self.session, style_name)
-        aspect_id = await get_aspect_id(self.session, aspect_name) if aspect_name else None
+        aspect_id = (
+            await get_aspect_id(self.session, aspect_name) if aspect_name else None
+        )
 
         context_data = {
             "name": poi["name"],
@@ -66,7 +75,9 @@ class ImageGenerationService:
                 }
             # If task_id is set, look up the job row for status
             else:
-                job_stmt = select(ImageGenerationJob).where(ImageGenerationJob.task_id == image_row.task_id)
+                job_stmt = select(ImageGenerationJob).where(
+                    ImageGenerationJob.task_id == image_row.task_id
+                )
                 job_result = await self.session.execute(job_stmt)
                 job_row = job_result.scalars().first()
                 if job_row:
@@ -74,14 +85,14 @@ class ImageGenerationService:
                         "status": job_row.status,
                         "task_id": job_row.task_id,
                         "poi_id": image_row.poi_id,
-                        "image": image_row
+                        "image": image_row,
                     }
                 # Fallback: If job row is missing, treat as generating (or handle as error)
                 return {
                     "status": "generating",
                     "task_id": image_row.task_id,
                     "poi_id": image_row.poi_id,
-                    "image": image_row
+                    "image": image_row,
                 }
 
         # 2. Compose prompt
@@ -89,7 +100,9 @@ class ImageGenerationService:
             self.session, provider, model, style_id, aspect_id, prompt_version
         )
         if not tmpl:
-            raise NotFoundInDBError("Image prompt template not found for these parameters")
+            raise NotFoundInDBError(
+                "Image prompt template not found for these parameters"
+            )
         builder = PromptBuilder(tmpl.template)
         prompt = builder.render(**(context_data or {}))
 
@@ -141,7 +154,6 @@ class ImageGenerationService:
             )
             await self.session.execute(ins)
         await self.session.commit()
-
 
         # Dispatch Celery task
         generate_image_task.delay(

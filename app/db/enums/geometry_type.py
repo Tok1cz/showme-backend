@@ -1,9 +1,9 @@
 import enum
 
+
 class GeometryType(str, enum.Enum):
     POINT = "POINT"
     POLYGON = "POLYGON"
     LINESTRING = "LINESTRING"
     MULTIPOLYGON = "MULTIPOLYGON"
     MULTILINESTRING = "MULTILINESTRING"
-    

@@ -1,5 +1,7 @@
 from openai import AsyncOpenAI
+
 from app.services.text_generation.provider import TextGenerationProvider
+
 
 class OpenAITextProvider(TextGenerationProvider):
     def __init__(self, api_key: str, default_model: str = "gpt-4o"):
@@ -11,7 +13,7 @@ class OpenAITextProvider(TextGenerationProvider):
             model=model or self.default_model,
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=kwargs.get("max_tokens", 10000),
-       #     temperature=kwargs.get("temperature", 0.4),
+            #     temperature=kwargs.get("temperature", 0.4),
         )
         return response.choices[0].message.content.strip()
 

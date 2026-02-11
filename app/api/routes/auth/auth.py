@@ -1,6 +1,8 @@
 from fastapi import APIRouter
-from app.services.auth.oauth import fastapi_users, google_oauth_client, oauth_backend
+
 from app.core.settings import settings
+from app.services.auth.oauth import fastapi_users, google_oauth_client, oauth_backend
+
 # TODO:
 # Actually register with Oauth Provider
 router = APIRouter(prefix="/auth")

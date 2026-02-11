@@ -1,6 +1,6 @@
 from abc import abstractmethod
-from app.services.generation.base import BaseGenerationProvider
 
+from app.services.generation.base import BaseGenerationProvider
 
 
 class TextGenerationProvider(BaseGenerationProvider):
