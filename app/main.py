@@ -21,7 +21,6 @@ else:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Register your providers here at startup
     register_providers()
     yield
 
@@ -32,13 +31,12 @@ app.mount("/audio", StaticFiles(directory="./audio"), name="audio")
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(poi_router, tags=["POIs"])
 
-app.include_router(admin_router,  tags=["Admin"])
+app.include_router(admin_router, tags=["Admin"])
 
 app.include_router(refdata.router, prefix="/refdata", tags=["Refdata"])
 app.include_router(health.router)
 
 
-# Add API Key security scheme to OpenAPI
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -49,17 +47,13 @@ def custom_openapi():
         routes=app.routes,
     )
     openapi_schema["components"]["securitySchemes"] = {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "X-API-Key"
-        }
+        "ApiKeyAuth": {"type": "apiKey", "in": "header", "name": "X-API-Key"}
     }
-    # Apply globally (all endpoints)
     for path in openapi_schema["paths"].values():
         for method in path.values():
             method.setdefault("security", []).append({"ApiKeyAuth": []})
     app.openapi_schema = openapi_schema
     return app.openapi_schema
+
 
 app.openapi = custom_openapi

@@ -7,12 +7,13 @@ import app.tasks.audio_generation
 
 celery_app = Celery(
     "osm_import",
-    broker=settings.CELERY_BROKER_URL,  # e.g., "redis://localhost:6379/0"
-    backend=settings.CELERY_BACKEND_URL,  # optional: "redis://localhost:6379/1"
+    broker=settings.CELERY_BROKER_URL,
+    backend=settings.CELERY_BACKEND_URL,
     include=["app.services.osm_import.runner"],
 )
-celery_app.autodiscover_tasks([
-    "app.tasks",
-])
+celery_app.autodiscover_tasks(
+    [
+        "app.tasks",
+    ]
+)
 register_providers()
-
